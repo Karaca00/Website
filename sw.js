@@ -1,5 +1,5 @@
 /* Service Worker Master v2.7 - Ultra-Fast Silent Update */
-const CACHE_NAME = 'editor-v3.1.1'; 
+const CACHE_NAME = 'editor-v3.1.5'; 
 
 const ASSETS = [
   './',
