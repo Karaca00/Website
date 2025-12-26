@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover, shrink-to-fit=no" />
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#121212">
-<title>Roblox Monaco IDE Pro</title>
+<title>Roblox IDE</title>
 
 <style>
 :root {
@@ -31,7 +31,7 @@ html, body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Editor Slide Animations */
+/* Editor Slide Transitions */
 .slide-left-out { animation: slideLeftOut 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
 .slide-left-in { animation: slideLeftIn 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
 .slide-right-out { animation: slideRightOut 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
@@ -42,7 +42,7 @@ html, body {
 @keyframes slideRightOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(30px); opacity: 0; } }
 @keyframes slideRightIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-/* --- Header Section --- */
+/* --- Layout Components --- */
 #header {
   height: 52px; background: var(--bg-header);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -77,7 +77,7 @@ html, body {
 }
 .zoom-btn:hover { background: var(--accent); }
 
-/* --- Tab Bar Section --- */
+/* --- Tab Bar Area --- */
 #tab-bar {
   height: 42px; background: #181818;
   display: flex; align-items: center; border-bottom: 1px solid var(--border);
@@ -91,13 +91,12 @@ html, body {
   padding: 0 22px; color: var(--text-dim); font-size: 12px;
   cursor: pointer; background: transparent; border-right: 1px solid rgba(255,255,255,0.03);
   min-width: 100px; max-width: 200px; user-select: none;
-  transition: color 0.3s;
-  position: relative; z-index: 2;
+  transition: color 0.3s; position: relative; z-index: 2;
 }
 .tab.active { color: #fff; }
 .tab-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* เฉพาะ Indicator ที่เลื่อนสไลด์ */
+/* เฉพาะ Indicator ที่ขยับสไลด์ */
 #tab-indicator {
   position: absolute; bottom: 0; height: 3px;
   background: var(--accent); box-shadow: 0 -2px 10px var(--accent);
@@ -112,7 +111,7 @@ html, body {
 }
 #add-tab-btn:hover { color: #fff; transform: scale(1.2); }
 
-/* --- Editor Area --- */
+/* --- Editor Viewport --- */
 #container-viewport { width: 100%; height: calc(100% - 94px); background: var(--bg-dark); overflow: hidden; position: relative; }
 #container { width: 100%; height: 100%; }
 
@@ -152,9 +151,9 @@ input, textarea { font-size: 16px !important; }
 
 <body>
 <div id="header">
-    <div class="brand">ROBLOX IDE PRO</div>
+    <div class="brand">ROBLOX IDE</div>
     <div class="controls">
-        <button id="install-app-btn" title="ติดตั้งลงเครื่อง">
+        <button id="install-app-btn" title="Install App">
             <span>📥</span> Install App
         </button>
         <div class="zoom-group">
@@ -188,10 +187,10 @@ input, textarea { font-size: 16px !important; }
 
 <script>
 /* ==========================================================
-   INSTANT UI RENDERER (Render before Monaco loads)
+   INSTANT UI & ENVIRONMENT RENDERER (Logic Before Monaco Loads)
    ========================================================== */
-const TABS_KEY = 'roblox_tabs_master_v15';
-const ACTIVE_ID_KEY = 'active_tab_id_v15';
+const TABS_KEY = 'roblox_tabs_master_v21';
+const ACTIVE_ID_KEY = 'active_tab_id_v21';
 const ZOOM_KEY = 'roblox_editor_zoom_v1';
 const DEFAULT_CODE = 'print("Hello World")';
 
@@ -199,6 +198,7 @@ let tabs = JSON.parse(localStorage.getItem(TABS_KEY)) || [{ id: Date.now(), name
 let activeTabId = parseInt(localStorage.getItem(ACTIVE_ID_KEY)) || tabs[0].id;
 let currentFontSize = parseInt(localStorage.getItem(ZOOM_KEY)) || 16;
 let targetTabId = null;
+let deferredPrompt;
 
 function updateIndicator() {
     const activeTabEl = document.querySelector('.tab.active');
@@ -216,104 +216,158 @@ function renderTabs() {
         const div = document.createElement('div');
         div.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
         div.innerHTML = `<span class="tab-name">${tab.name}</span>`;
-        
         let pressTimer;
         const startPress = (e) => {
             const pos = e.touches ? e.touches[0] : e;
-            pressTimer = setTimeout(() => showTabMenu(tab.id, pos.clientX, pos.clientY), 600);
+            pressTimer = setTimeout(() => window.showTabMenu(tab.id, pos.clientX, pos.clientY), 600);
         };
         const endPress = () => clearTimeout(pressTimer);
-        
-        div.addEventListener('mousedown', startPress);
-        div.addEventListener('mouseup', endPress);
-        div.addEventListener('touchstart', startPress);
-        div.addEventListener('touchend', endPress);
+        div.addEventListener('mousedown', startPress); div.addEventListener('mouseup', endPress);
+        div.addEventListener('touchstart', startPress); div.addEventListener('touchend', endPress);
         div.onclick = () => window.switchTab(tab.id);
         container.appendChild(div);
     });
     setTimeout(updateIndicator, 10);
 }
 
-// เรียก Render ทันทีที่อ่านถึงบรรทัดนี้
-renderTabs();
-
-/* ==========================================================
-   PWA & ENVIRONMENT DETECTION
-   ========================================================== */
+// ตรวจสอบโหมดแอป Standalone
 const getIsStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-if (getIsStandalone()) document.getElementById('install-app-btn')?.remove();
+
+window.addEventListener('DOMContentLoaded', () => {
+    renderTabs();
+    if (getIsStandalone()) document.getElementById('install-app-btn')?.remove();
+});
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if(!getIsStandalone()) document.getElementById('install-app-btn').style.display = 'flex';
+});
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
 <script>
 /* ==========================================================
-   PWA AUTO UPDATE
+   OFFLINE WORKER & AUTO COMPLETE FIX (App Mode Enabled)
    ========================================================== */
+window.MonacoEnvironment = {
+    getWorkerUrl: (workerId, label) => `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+        self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/' };
+        importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/base/worker/workerMain.js');
+    `)}`
+};
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').then(reg => {
             reg.update();
-            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update(); });
-            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            reg.addEventListener('updatefound', () => {
-                const newWorker = reg.installing;
-                newWorker.addEventListener('statechange', () => {
-                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    }
-                });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') reg.update();
             });
+            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
         });
     });
     let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => { if (!refreshing) { window.location.reload(); refreshing = true; } });
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) { window.location.reload(); refreshing = true; }
+    });
 }
 
 require.config({ paths:{vs:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs'} });
 
 require(['vs/editor/editor.main'],()=>{
 
+/* ==========================================================
+   ULTIMATE MEGA ROBLOX API DATABASE (MASTER FULL)
+   ========================================================== */
 const API={
-  game:{props:['Workspace','Players','Lighting','ReplicatedStorage','ServerStorage','StarterGui','StarterPack','RunService','TweenService','UserInputService','HttpService','DataStoreService','Debris','Teams','PathfindingService','CollectionService','MarketplaceService','TeleportService','Chat','SoundService','LogService','BadgeService','AssetService','AnalyticsService','SocialService'],methods:['GetService','BindToClose','IsLoaded','Shutdown','IsAncestorOf','IsDescendantOf','GetObjects']},
-  Workspace:{props:['CurrentCamera','Terrain','Gravity','GlobalWind','FallenPartsDestroyHeight','StreamingEnabled','DistributedGameTime'],methods:['Raycast','GetPartBoundsInBox','GetPartsInPart','GetPartBoundsInRadius','FindPartOnRay','FindPartOnRayWithIgnoreList','BulkMoveTo','GetRealtimeVelocityAtPoint']},
-  Players:{props:['LocalPlayer','MaxPlayers','RespawnTime','PlayerAdded','PlayerRemoving'],methods:['GetPlayers','GetPlayerFromCharacter','GetNameFromUserIdAsync','GetUserIdFromNameAsync','GetUserThumbnailAsync','CreateHumanoidModelFromUserId','BanAsync','UnbanAsync']},
-  Lighting:{props:['Ambient','Brightness','ColorShift_Bottom','ColorShift_Top','GlobalShadows','OutdoorAmbient','Outlines','ShadowShadowSoftness','ClockTime','GeographicLatitude','ExposureCompensation','FogColor','FogEnd','FogStart','EnvironmentDiffuseScale','EnvironmentSpecularScale'],methods:['SetMinutesAfterMidnight','GetMinutesAfterMidnight']},
-  Instance:{props:['Name','Parent','ClassName','Archivable'],methods:['new','Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','GetPropertyChangedSignal','SetAttribute','GetAttribute','ClearAllChildren','IsDescendantOf','GetFullName','RemoveAttribute','GetAttributes']},
-  Player:{props:['Name','UserId','Character','Backpack','PlayerGui','Team','DisplayName','AccountAge','LocaleId','MembershipType','FollowUserId','RespawnLocation','CharacterAdded','CharacterRemoving'],methods:['Kick','LoadCharacter','GetMouse','IsInGroup','GetRankInGroup','GetRoleInGroup','ClearCharacterAppearance','HasAppearanceLoaded','Move','SetCanSelfTerminate']},
-  Humanoid:{props:['Health','MaxHealth','WalkSpeed','JumpPower','JumpHeight','HipHeight','Sit','MoveDirection','PlatformStand','AutoRotate','UseJumpPower','DisplayName','HealthDisplayType','Died','StateChanged','ClimbSpeed','FloorMaterial'],methods:['TakeDamage','Move','MoveTo','EquipTool','UnequipTools','ChangeState','GetState','LoadAnimation','AddCustomStatus','ApplyDescription']},
-  BasePart:{props:['Anchored','CanCollide','CanTouch','CanQuery','Transparency','Reflectance','Color','Material','Position','Size','CFrame','Velocity','AssemblyLinearVelocity','AssemblyAngularVelocity','Mass','Orientation','Shape','Locked','CastShadow','CollisionGroup','PivotOffset','Touched','TouchEnded','Changed'],methods:['ApplyImpulse','GetMass','SetNetworkOwner','GetNetworkOwner','BreakJoints','GetRootPart','GetConnectedParts','ApplyAngularImpulse','Resize','TranslateBy','Subtract','Union','Intersect']},
+  game:{props:['Workspace','Players','Lighting','ReplicatedStorage','ServerStorage','StarterGui','StarterPack','RunService','TweenService','UserInputService','HttpService','DataStoreService','Debris','Teams','PathfindingService','CollectionService','MarketplaceService','TeleportService','Chat','SoundService','LogService','BadgeService','AssetService','AnalyticsService','SocialService','Selection','TestService','VRService','PolicyService','ProximityPromptService'],methods:['GetService','BindToClose','IsLoaded','Shutdown','IsAncestorOf','IsDescendantOf','GetObjects','FindService','GetJobsExtended','IsNetworkSettled','SetPlaceId','SetUniverseId']},
+  Workspace:{props:['CurrentCamera','Terrain','Gravity','GlobalWind','FallenPartsDestroyHeight','StreamingEnabled','DistributedGameTime','AllowAudioIsolation','InterpolationThrottling','SignalBehavior'],methods:['Raycast','GetPartBoundsInBox','GetPartsInPart','GetPartBoundsInRadius','FindPartOnRay','FindPartOnRayWithIgnoreList','BulkMoveTo','GetRealtimeVelocityAtPoint','FindPartOnRayWithWhitelist','Spherecast','Blockcast','Shapecast']},
+  Players:{props:['LocalPlayer','MaxPlayers','RespawnTime','PlayerAdded','PlayerRemoving','CharacterAutoLoads','BubbleChat','PreferredPlayersCount'],methods:['GetPlayers','GetPlayerFromCharacter','GetNameFromUserIdAsync','GetUserIdFromNameAsync','GetUserThumbnailAsync','CreateHumanoidModelFromUserId','BanAsync','UnbanAsync','GetFriendsAsync','GetUserFriendsAsync','IsFriendsWith']},
+  Lighting:{props:['Ambient','Brightness','ColorShift_Bottom','ColorShift_Top','GlobalShadows','OutdoorAmbient','Outlines','ShadowShadowSoftness','ClockTime','GeographicLatitude','ExposureCompensation','FogColor','FogEnd','FogStart','EnvironmentDiffuseScale','EnvironmentSpecularScale','Technology'],methods:['SetMinutesAfterMidnight','GetMinutesAfterMidnight']},
+  Instance:{props:['Name','Parent','ClassName','Archivable'],methods:['new','Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','GetPropertyChangedSignal','SetAttribute','GetAttribute','ClearAllChildren','IsDescendantOf','GetFullName','RemoveAttribute','GetAttributes','FindFirstAncestor','FindFirstAncestorOfClass','FindFirstAncestorWhichIsA','FindFirstChildOfClass','FindFirstChildWhichIsA']},
+  Player:{props:['Name','UserId','Character','Backpack','PlayerGui','Team','DisplayName','AccountAge','LocaleId','MembershipType','FollowUserId','RespawnLocation','CharacterAdded','CharacterRemoving','SimulationRadius','DataReady'],methods:['Kick','LoadCharacter','GetMouse','IsInGroup','GetRankInGroup','GetRoleInGroup','ClearCharacterAppearance','HasAppearanceLoaded','Move','SetCanSelfTerminate','GetJoinData','GetNetworkSimulator']},
+  Humanoid:{props:['Health','MaxHealth','WalkSpeed','JumpPower','JumpHeight','HipHeight','Sit','MoveDirection','PlatformStand','AutoRotate','UseJumpPower','DisplayName','HealthDisplayType','Died','StateChanged','ClimbSpeed','FloorMaterial','BreakJointsOnDeath','DisplayDistanceType','RigType'],methods:['TakeDamage','Move','MoveTo','EquipTool','UnequipTools','ChangeState','GetState','LoadAnimation','AddCustomStatus','ApplyDescription','GetAccessories','GetBodyPartR6','GetBodyPartR15']},
+  BasePart:{props:['Anchored','CanCollide','CanTouch','CanQuery','Transparency','Reflectance','Color','Material','Position','Size','CFrame','Velocity','AssemblyLinearVelocity','AssemblyAngularVelocity','Mass','Orientation','Shape','Locked','CastShadow','CollisionGroup','PivotOffset','Touched','TouchEnded','Changed','LocalTransparencyModifier','CenterOfMass','ReceiveAge'],methods:['ApplyImpulse','GetMass','SetNetworkOwner','GetNetworkOwner','BreakJoints','GetRootPart','GetConnectedParts','ApplyAngularImpulse','Resize','TranslateBy','Subtract','Union','Intersect','ApplyImpulseAtPosition','GetClosestPointOnSurface']},
   TweenService:{props:[],methods:['Create','GetValue']},
-  RunService:{props:['Heartbeat','RenderStepped','Stepped'],methods:['IsClient','IsServer','IsStudio','IsRunning']},
+  RunService:{props:['Heartbeat','RenderStepped','Stepped'],methods:['IsClient','IsServer','IsStudio','IsRunning','BindToRenderStep','UnbindFromRenderStep']},
+  HttpService:{props:['HttpEnabled'],methods:['GetAsync','PostAsync','JSONEncode','JSONDecode','GenerateGUID','UrlEncode','RequestAsync']},
+  DataStoreService:{props:[],methods:['GetDataStore','GetOrderedDataStore','GetGlobalDataStore','ListDataStoresAsync']},
+  CollectionService:{props:[],methods:['AddTag','RemoveTag','HasTag','GetTags','GetTagged','GetInstanceAddedSignal','GetInstanceRemovedSignal']},
+  TweenInfo:{static:['new'],props:['Time','EasingStyle','EasingDirection','RepeatCount','Reverses','DelayTime']},
   RemoteEvent:{props:['OnServerEvent','OnClientEvent'],methods:['FireServer','FireClient','FireAllClients']},
-  Sound:{props:['Playing','Paused','TimePosition','Volume','Pitch','PlaybackSpeed','Looped','SoundId'],methods:['Play','Stop','Pause','Resume']},
+  RemoteFunction:{props:['OnServerInvoke','OnClientInvoke'],methods:['InvokeServer','InvokeClient']},
   Camera:{props:['CFrame','Focus','FieldOfView','CameraType','ViewportSize','NearPlaneZ'],methods:['WorldToViewportPoint','WorldToScreenPoint','ViewportPointToRay','ScreenPointToRay']},
   UserInputService:{props:['KeyboardEnabled','MouseEnabled','TouchEnabled','GamepadEnabled','AccelerometerEnabled','GyroscopeEnabled','InputBegan','InputEnded','InputChanged'],methods:['GetKeysPressed','IsKeyDown','IsMouseButtonPressed','GetFocusedTextBox']},
-  HttpService:{props:['HttpEnabled'],methods:['GetAsync','PostAsync','JSONEncode','JSONDecode','GenerateGUID']}
+  Debris:{methods:['AddItem']},
+  MarketplaceService:{methods:['GetProductInfo','PromptGamePassPurchase','PromptPurchase','UserOwnsGamePassAsync']},
+  SoundService:{props:['AmbientReverb','DistanceFactor','RolloffScale'],methods:['GetListener']},
+  LogService:{methods:['GetLogHistory']},
+  BadgeService:{methods:['GetBadgeInfoAsync','AwardBadge','UserHasBadgeAsync']}
 };
-const DATA_TYPES={
-  Vector3:{props:['X','Y','Z','Magnitude','Unit'],methods:['Lerp','Dot','Cross','FuzzyEq','Max','Min'],static:['new','zero','one','xAxis','yAxis','zAxis']},
-  CFrame:{props:['Position','LookVector','RightVector','UpVector','X','Y','Z','p'],methods:['Lerp','Inverse','ToObjectSpace','ToWorldSpace','ToEulerAnglesXYZ','ToOrientation','ToAxisAngle','GetComponents'],static:['new','Angles','lookAt','fromAxisAngle','fromMatrix','fromOrientation','fromEulerAnglesXYZ']},
-  Color3:{props:['R','G','B'],methods:['ToHSV','Lerp'],static:['new','fromRGB','fromHSV','fromHex']},
-  UDim2:{props:['X','Y'],methods:['Lerp'],static:['new','fromScale','fromOffset']},
-  DateTime:{props:['UnixTimestamp','UnixTimestampMillis'],methods:['FormatLocalTime','FormatUniversalTime','ToUniversalTime','ToISO8601'],static:['now','fromUnixTimestamp','fromISO8601']},
-  Ray:{props:['Origin','Direction','Unit'],methods:['ClosestPoint','Distance'],static:['new']},
-  Region3:{props:['CFrame','Size'],static:['new']},
-  Rect:{props:['Min','Max'],static:['new']},
-  Font:{props:['Family','Weight'],static:['new','fromId']},
-  Axes:{props:['X','Y','Z'],static:['new']},
-  Faces:{props:['Top','Bottom'],static:['new']}
-};
-const LUA_LIBS={table:{methods:['insert','remove','sort','concat','find']},math:{methods:['abs','acos','asin','ceil','cos','deg','exp','floor','max','min','pow','rad','random','sin','sqrt','tan','clamp','huge','pi']},task:{methods:['wait','spawn','defer','delay','cancel']}};
-const GLOBAL_FUNCS=['print','warn','error','wait','spawn','delay','tick','time','typeof','type','pairs','ipairs','pcall','xpcall','assert','require','tostring','tonumber','task','shared','_G'];
-const SNIPPETS=[{label:'if',insertText:'if ${1:condition} then\n\t$0\nend'},{label:'function',insertText:'function ${1:name}(${2:params})\n\t$0\nend'},{label:'fori',insertText:'for ${1:i} = ${2:1}, ${3:10} do\n\t$0\nend'}];
-const LUA_KEYWORDS=['local','function','if','then','elseif','else','for','while','repeat','until','do','end','return','break','continue','and','or','not','true','false','nil','in'];
-const COMMON=['Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','Connect','Wait','Once','Disconnect','GetPropertyChangedSignal','SetAttribute','GetAttribute','IsDescendantOf','GetFullName'];
 
+const DATA_TYPES={
+  Vector3:{props:['X','Y','Z','Magnitude','Unit'],methods:['Dot','Cross','Lerp','FuzzyEq','Abs','Ceil','Floor','Sign','Max','Min'],static:['new','zero','one','xAxis','yAxis','zAxis']},
+  Vector2:{props:['X','Y','Magnitude','Unit'],methods:['Dot','Cross','Lerp'],static:['new','zero','one']},
+  CFrame:{props:['Position','LookVector','RightVector','UpVector','X','Y','Z','p','Rotation'],methods:['Lerp','Inverse','ToObjectSpace','ToWorldSpace','ToEulerAnglesXYZ','ToOrientation','ToAxisAngle','GetComponents','Inverse','Orthonormalize'],static:['new','Angles','lookAt','fromAxisAngle','fromMatrix','fromOrientation','fromEulerAnglesXYZ']},
+  Color3:{props:['R','G','B'],methods:['ToHSV','Lerp'],static:['new','fromRGB','fromHSV','fromHex']},
+  BrickColor:{props:['Name','Number','Color','r','g','b'],static:['new','Random','White','Black','Red','Blue','Green','Yellow','DarkGray','Gray','palette']},
+  UDim2:{props:['X','Y'],methods:['Lerp'],static:['new','fromScale','fromOffset']},
+  UDim:{props:['Scale','Offset'],static:['new']},
+  Ray:{props:['Origin','Direction','Unit'],methods:['ClosestPoint','Distance'],static:['new']},
+  Region3:{props:['CFrame','Size'],methods:['ExpandToGrid'],static:['new']},
+  Rect:{props:['Min','Max','Width','Height'],static:['new']},
+  ColorSequence:{props:['Keypoints'],static:['new']},
+  ColorSequenceKeypoint:{props:['Time','Value'],static:['new']},
+  NumberSequence:{props:['Keypoints'],static:['new']},
+  NumberSequenceKeypoint:{props:['Time','Value','Envelope'],static:['new']},
+  NumberRange:{props:['Min','Max'],static:['new']},
+  DateTime:{props:['UnixTimestamp','UnixTimestampMillis'],methods:['FormatLocalTime','FormatUniversalTime','ToUniversalTime','ToISO8601'],static:['now','fromUnixTimestamp','fromISO8601']},
+  PhysicalProperties:{props:['Density','Friction','Elasticity','FrictionWeight','ElasticityWeight'],static:['new']},
+  Font:{props:['Family','Weight','Style','Bold'],static:['new','fromId']},
+  Axes:{props:['X','Y','Z'],static:['new']},
+  Faces:{props:['Top','Bottom','Left','Right','Back','Front'],static:['new']},
+  RaycastParams:{props:['FilterDescendantsInstances','FilterType','IgnoreWater','CollisionGroup','RespectCanCollide'],static:['new']}
+};
+
+const LUA_LIBS={
+  table:{methods:['insert','remove','sort','concat','find','create','clear','unpack','pack','move','freeze','isfrozen']},
+  math:{methods:['abs','acos','asin','atan','atan2','ceil','cos','cosh','deg','exp','floor','fmod','frexp','ldexp','log','log10','max','min','modf','pow','rad','random','randomseed','sin','sinh','sqrt','tan','tanh','clamp','huge','pi','noise','round','sign']},
+  string:{methods:['byte','char','find','format','gmatch','gsub','len','lower','match','rep','reverse','sub','upper','split','pack','unpack','packsize']},
+  task:{methods:['wait','spawn','defer','delay','cancel','desynchronize','synchronize']},
+  os:{methods:['time','date','difftime','clock']},
+  utf8:{methods:['char','charpos','codes','codepoint','len','offset']},
+  coroutine:{methods:['create','resume','running','status','wrap','yield','close','isyieldable']},
+  debug:{methods:['traceback','profilebegin','profileend']}
+};
+
+const GLOBAL_FUNCS=['print','warn','error','wait','spawn','delay','tick','time','typeof','type','pairs','ipairs','pcall','xpcall','assert','require','tostring','tonumber','task','shared','_G','getfenv','setfenv','next','rawget','rawset','rawequal','select','gcinfo','collectgarbage'];
+
+const SNIPPETS=[
+  {label:'if',insertText:'if ${1:condition} then\n\t$0\nend'},
+  {label:'fori',insertText:'for ${1:i} = ${2:1}, ${3:10} do\n\t$0\nend'},
+  {label:'forp',insertText:'for ${1:i}, ${2:v} in pairs(${3:table}) do\n\t$0\nend'},
+  {label:'function',insertText:'function ${1:name}(${2:params})\n\t$0\nend'},
+  {label:'remote',insertText:'game:GetService("ReplicatedStorage"):WaitForChild("${1:RemoteName}").OnServerEvent:Connect(function(player, $2)\n\t$0\nend)'},
+  {label:'datastore',insertText:'local DataStoreService = game:GetService("DataStoreService")\nlocal myDataStore = DataStoreService:GetDataStore("${1:DataName}")\n\nlocal success, errorMessage = pcall(function()\n\t$0\nend)'},
+  {label:'raycast',insertText:'local params = RaycastParams.new()\nparams.FilterType = Enum.RaycastFilterType.Exclude\nlocal result = workspace:Raycast(${1:origin}, ${2:direction}, params)\nif result then\n\t$0\nend'},
+  {label:'tween',insertText:'local TweenService = game:GetService("TweenService")\nlocal info = TweenInfo.new(${1:1})\nlocal tween = TweenService:Create(${2:object}, info, {${3:Property} = ${4:Value}})\ntween:Play()'}
+];
+
+const LUA_KEYWORDS=['local','function','if','then','elseif','else','for','while','repeat','until','do','end','return','break','continue','and','or','not','true','false','nil','in'];
+const COMMON=['Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','Connect','Wait','Once','Disconnect','GetPropertyChangedSignal','SetAttribute','GetAttribute','IsDescendantOf','GetFullName','FindFirstAncestor'];
+
+/* ==========================================================
+   MONACO EDITOR INSTANCE
+   ========================================================== */
 const editor = monaco.editor.create(document.getElementById('container'), {
     value: (tabs.find(t => t.id === activeTabId) || tabs[0]).content,
     language: 'lua', theme: 'vs-dark', fontSize: currentFontSize, automaticLayout: true,
     minimap: { enabled: false }, cursorSmoothCaretAnimation: true,
-    smoothScrolling: true, wordWrap: "on", fixedOverflowWidgets: true, links: false
+    smoothScrolling: true, wordWrap: "on", fixedOverflowWidgets: true, links: false,
+    quickSuggestions: { other: true, comments: false, strings: true },
+    suggestOnTriggerCharacters: true, parameterHints: { enabled: true },
+    tabCompletion: "on", snippetSuggestions: "top"
 });
 
 function saveState() {
@@ -327,8 +381,7 @@ document.getElementById('zoom-out-btn').onclick = () => adjustZoom(-2);
 
 function adjustZoom(amount) {
     currentFontSize = Math.max(10, Math.min(40, currentFontSize + amount));
-    editor.updateOptions({ fontSize: currentFontSize });
-    saveState();
+    editor.updateOptions({ fontSize: currentFontSize }); saveState();
 }
 
 window.switchTab = (id) => {
@@ -340,8 +393,7 @@ window.switchTab = (id) => {
     if(tabs[oldIndex]) tabs[oldIndex].content = editor.getValue();
     container.className = direction === 'left' ? 'slide-left-out' : 'slide-right-out';
     setTimeout(() => {
-        activeTabId = id;
-        editor.setValue(tabs[newIndex].content);
+        activeTabId = id; editor.setValue(tabs[newIndex].content);
         container.className = direction === 'left' ? 'slide-left-in' : 'slide-right-in';
         saveState(); renderTabs();
         setTimeout(() => { container.className = ''; }, 250);
@@ -357,23 +409,19 @@ document.getElementById('add-tab-btn').onclick = () => {
     const container = document.getElementById('container');
     container.className = 'slide-left-out';
     setTimeout(() => {
-        editor.setValue(DEFAULT_CODE);
-        container.className = 'slide-left-in';
+        editor.setValue(DEFAULT_CODE); container.className = 'slide-left-in';
         saveState(); renderTabs();
         setTimeout(() => { container.className = ''; }, 250);
     }, 150);
 };
 
-/* --- Context Menu Logic --- */
 const menu = document.getElementById('tab-menu');
 const mainMenu = document.getElementById('main-menu-group');
 const renameSection = document.getElementById('rename-section');
 const renameInput = document.getElementById('inner-rename-input');
 
 window.showTabMenu = (id, x, y) => {
-    targetTabId = id;
-    mainMenu.style.display = 'block';
-    renameSection.style.display = 'none';
+    targetTabId = id; mainMenu.style.display = 'block'; renameSection.style.display = 'none';
     menu.style.display = 'block';
     if (x + 200 > window.innerWidth) x -= 200;
     menu.style.left = x + 'px'; menu.style.top = y + 'px';
@@ -383,10 +431,8 @@ document.addEventListener('mousedown', (e) => { if (!menu.contains(e.target)) me
 
 document.getElementById('menu-rename').onclick = () => {
     const tab = tabs.find(t => t.id === targetTabId);
-    mainMenu.style.display = 'none';
-    renameSection.style.display = 'block';
-    renameInput.value = tab.name;
-    renameInput.focus(); renameInput.select();
+    mainMenu.style.display = 'none'; renameSection.style.display = 'block';
+    renameInput.value = tab.name; renameInput.focus(); renameInput.select();
 };
 
 document.getElementById('rename-cancel').onclick = (e) => {
@@ -407,15 +453,11 @@ document.getElementById('menu-delete').onclick = () => {
     menu.style.display = 'none';
     tabs = tabs.filter(t => t.id !== targetTabId);
     if (tabs.length === 0) tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE }];
-    if (activeTabId === targetTabId) {
-        activeTabId = tabs[0].id; editor.setValue(tabs[0].content);
-    }
+    if (activeTabId === targetTabId) { activeTabId = tabs[0].id; editor.setValue(tabs[0].content); }
     saveState(); renderTabs();
 };
 
 document.getElementById('install-app-btn').onclick = async () => {
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
     if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
@@ -428,14 +470,13 @@ editor.onDidChangeModelContent(() => {
     if (current) { current.content = editor.getValue(); saveState(); }
 });
 
-/* --- Roblox IntelliSense Provider --- */
 monaco.languages.registerCompletionItemProvider('lua', {
   triggerCharacters: ['.', ':', '"', "'"],
   provideCompletionItems(model, pos) {
-    const line = model.getLineContent(pos.lineNumber);
-    const before = line.slice(0, pos.column);
     const word = model.getWordUntilPosition(pos);
     const range = { startLineNumber: pos.lineNumber, endLineNumber: pos.lineNumber, startColumn: word.startColumn, endColumn: word.endColumn };
+    const line = model.getLineContent(pos.lineNumber);
+    const before = line.slice(0, pos.column);
     const m = before.match(/([\w\.:"'\(\)]+)([\.:])$/);
     if (m) {
       const type = m[1]; const colon = m[2] === ':';
@@ -454,6 +495,7 @@ monaco.languages.registerCompletionItemProvider('lua', {
         if (d.methods) d.methods.forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
         return { suggestions: out };
       }
+      if (LUA_LIBS[type] && !colon) return { suggestions: LUA_LIBS[type].methods.map(fn => ({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range })) };
     }
     const suggestions = [];
     LUA_KEYWORDS.forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Keyword, insertText: k, range }));
@@ -465,37 +507,8 @@ monaco.languages.registerCompletionItemProvider('lua', {
   }
 });
 
-// Monaco Menu Actions
-editor.addAction({ 
-    id: 'download-script', label: 'Download Current Tab (.txt)', contextMenuGroupId: 'navigation', 
-    run: (ed) => { 
-        const name = (tabs.find(t=>t.id===activeTabId).name) + ".txt"; 
-        const blob = new Blob([ed.getValue()], { type: 'text/plain' }); 
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href); 
-    } 
-});
-
-editor.addAction({ 
-    id: 'load-script', label: 'Load Script from Device', contextMenuGroupId: 'navigation', 
-    run: () => {
-        const f = document.createElement('input'); f.type = 'file'; f.accept = '.lua, .txt';
-        f.onchange = (e) => {
-            const file = e.target.files[0]; if (!file) return;
-            const r = new FileReader(); 
-            r.onload = (ev) => { 
-                const content = ev.target.result;
-                const cur = tabs.find(t => t.id === activeTabId);
-                if (cur) {
-                    cur.content = content; cur.name = file.name.split('.')[0]; 
-                    editor.setValue(content); renderTabs(); saveState();
-                }
-            }; 
-            r.readAsText(file);
-        };
-        f.click();
-    } 
-});
-
+editor.addAction({ id: 'download-script', label: 'Download Current Tab (.txt)', contextMenuGroupId: 'navigation', run: (ed) => { const name = (tabs.find(t=>t.id===activeTabId).name) + ".txt"; const blob = new Blob([ed.getValue()], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href); } });
+editor.addAction({ id: 'load-script', label: 'Load Script from Device', contextMenuGroupId: 'navigation', run: () => { const f = document.createElement('input'); f.type = 'file'; f.accept = '.lua, .txt'; f.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { const content = ev.target.result; const cur = tabs.find(t => t.id === activeTabId); if (cur) { cur.content = content; cur.name = file.name.split('.')[0]; editor.setValue(content); renderTabs(); saveState(); } }; r.readAsText(file); }; f.click(); } });
 editor.addAction({ id: 'format', label: 'Format Document', contextMenuGroupId: 'navigation', keybindings: [monaco.KeyMod.Shift | monaco.KeyMod.Alt | monaco.KeyCode.KeyF], run: () => editor.getAction('editor.action.formatDocument').run() });
 
 window.addEventListener('resize', updateIndicator);
