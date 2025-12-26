@@ -4,95 +4,260 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover, shrink-to-fit=no" />
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1e1e1e">
-<title>Roblox Monaco Editor – Ultimate Mega API</title>
+<meta name="theme-color" content="#121212">
+<title>Roblox Monaco IDE Pro</title>
 
 <style>
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  background:#1e1e1e;
-  overflow:hidden;
-  font-family:system-ui,sans-serif;
-  -webkit-text-size-adjust: 100%;
-  touch-action: none; 
+:root {
+  --bg-dark: #121212;
+  --bg-panel: #1e1e1e;
+  --bg-header: rgba(24, 24, 24, 0.85);
+  --accent: #0078d4;
+  --text-main: #e1e1e1;
+  --text-dim: #888888;
+  --border: #2a2a2a;
 }
-#container{width:100%;height:100%}
 
-/* ===== แก้ไขปัญหาซูมอย่างเด็ดขาด (Deep Mobile Fix) ===== */
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: var(--bg-dark); overflow: hidden;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%; touch-action: none; 
+}
+
+/* --- Premium Animations --- */
+@keyframes slideDownHeader {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Editor Slide Animations */
+.slide-left-out { animation: slideLeftOut 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
+.slide-left-in { animation: slideLeftIn 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
+.slide-right-out { animation: slideRightOut 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
+.slide-right-in { animation: slideRightIn 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
+
+@keyframes slideLeftOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30px); opacity: 0; } }
+@keyframes slideLeftIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideRightOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(30px); opacity: 0; } }
+@keyframes slideRightIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* --- Header Section --- */
+#header {
+  height: 52px; background: var(--bg-header);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; border-bottom: 1px solid var(--border);
+  animation: slideDownHeader 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+}
+.brand { color: var(--text-main); font-size: 14px; font-weight: 800; letter-spacing: 2px; }
+.controls { display: flex; align-items: center; gap: 12px; }
+
+#install-app-btn {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  padding: 0 12px; height: 32px; border-radius: 8px;
+  cursor: pointer; display: none; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; transition: all 0.2s;
+  text-transform: uppercase;
+}
+#install-app-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.zoom-group {
+  display: flex; gap: 4px; background: rgba(255,255,255,0.05);
+  padding: 4px; border-radius: 10px; border: 1px solid var(--border);
+}
+.zoom-btn {
+  background: transparent; color: #fff; border: none;
+  width: 32px; height: 32px; border-radius: 7px;
+  cursor: pointer; font-size: 18px; display: flex;
+  align-items: center; justify-content: center; transition: 0.2s;
+}
+.zoom-btn:hover { background: var(--accent); }
+
+/* --- Tab Bar Section --- */
+#tab-bar {
+  height: 42px; background: #181818;
+  display: flex; align-items: center; border-bottom: 1px solid var(--border);
+  overflow-x: auto; scrollbar-width: none; position: relative;
+}
+#tab-bar::-webkit-scrollbar { display: none; }
+#tabs-container { display: flex; height: 100%; position: relative; }
+
+.tab {
+  height: 100%; display: flex; align-items: center;
+  padding: 0 22px; color: var(--text-dim); font-size: 12px;
+  cursor: pointer; background: transparent; border-right: 1px solid rgba(255,255,255,0.03);
+  min-width: 100px; max-width: 200px; user-select: none;
+  transition: color 0.3s;
+  position: relative; z-index: 2;
+}
+.tab.active { color: #fff; }
+.tab-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* เฉพาะ Indicator ที่เลื่อนสไลด์ */
+#tab-indicator {
+  position: absolute; bottom: 0; height: 3px;
+  background: var(--accent); box-shadow: 0 -2px 10px var(--accent);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1; border-radius: 3px 3px 0 0;
+}
+
+#add-tab-btn {
+  padding: 0 16px; height: 100%; background: transparent;
+  border: none; color: #555; font-size: 24px;
+  cursor: pointer; transition: 0.3s; z-index: 10;
+}
+#add-tab-btn:hover { color: #fff; transform: scale(1.2); }
+
+/* --- Editor Area --- */
+#container-viewport { width: 100%; height: calc(100% - 94px); background: var(--bg-dark); overflow: hidden; position: relative; }
+#container { width: 100%; height: 100%; }
+
+/* --- Context Menu (Tabs) --- */
+#tab-menu {
+  position: fixed; background: rgba(28, 28, 28, 0.98);
+  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6); padding: 8px; min-width: 200px; z-index: 10001;
+  display: none; transform-origin: top left;
+}
+.menu-group { display: flex; flex-direction: column; gap: 4px; }
+.menu-item {
+  padding: 12px 16px; color: #eee; font-size: 13px;
+  border-radius: 10px; cursor: pointer; display: flex;
+  align-items: center; justify-content: space-between;
+}
+.menu-item:hover { background: var(--accent); color: #fff; }
+.menu-item.danger:hover { background: #ff3b30; }
+
+.rename-ui { padding: 8px; display: none; }
+.rename-ui input {
+  width: 100%; box-sizing: border-box; padding: 12px;
+  background: #121212; border: 1px solid #444; color: #fff;
+  border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 12px;
+}
+.btn-row { display: flex; gap: 8px; }
+.btn-row button { flex: 1; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; }
+.btn-apply { background: var(--accent); color: #fff; }
+.btn-back { background: #333; color: #ccc; }
+
 .monaco-editor .inputarea.ime-input { font-size: 16px !important; }
-input, textarea, select, .monaco-editor textarea { font-size: 16px !important; outline: none; }
+input, textarea { font-size: 16px !important; }
 @viewport { width: device-width; zoom: 1.0; }
-
-/* ===== Modal UI (สำหรับแจ้งเตือนระบบ) ===== */
-.modal-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-.modal{
-  background:#252526;
-  width:320px;
-  border-radius:10px;
-  padding:20px;
-  color:#fff;
-  box-shadow:0 10px 40px rgba(0,0,0,0.8);
-  border: 1px solid #333;
-}
-.modal h3{margin:0 0 15px;font-size:18px; color: #0078d4;}
-.modal p{font-size:14px; color:#ccc; margin-bottom:20px; line-height:1.5;}
-.modal .buttons{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top: 5px;
-}
-.modal button{
-  border:none;
-  padding:8px 16px;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight: 500;
-}
-.modal .cancel{background:#3a3a3a;color:#fff}
-.modal .primary{background:#0078d4;color:#fff}
 </style>
 </head>
 
 <body>
-<div id="container"></div>
+<div id="header">
+    <div class="brand">ROBLOX IDE PRO</div>
+    <div class="controls">
+        <button id="install-app-btn" title="ติดตั้งลงเครื่อง">
+            <span>📥</span> Install App
+        </button>
+        <div class="zoom-group">
+            <button class="zoom-btn" id="zoom-out-btn">−</button>
+            <button class="zoom-btn" id="zoom-in-btn">+</button>
+        </div>
+    </div>
+</div>
+<div id="tab-bar">
+    <div id="tabs-container"></div>
+    <div id="tab-indicator"></div>
+    <button id="add-tab-btn">+</button>
+</div>
+<div id="container-viewport">
+    <div id="container"></div>
+</div>
+
+<div id="tab-menu">
+    <div class="menu-group" id="main-menu-group">
+        <div class="menu-item" id="menu-rename">Rename Script <span>✎</span></div>
+        <div class="menu-item danger" id="menu-delete">Delete Tab <span>🗑</span></div>
+    </div>
+    <div class="rename-ui" id="rename-section">
+        <input type="text" id="inner-rename-input" spellcheck="false" autocomplete="off">
+        <div class="btn-row">
+            <button class="btn-back" id="rename-cancel">Back</button>
+            <button class="btn-apply" id="rename-apply">Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ==========================================================
+   INSTANT UI RENDERER (Render before Monaco loads)
+   ========================================================== */
+const TABS_KEY = 'roblox_tabs_master_v15';
+const ACTIVE_ID_KEY = 'active_tab_id_v15';
+const ZOOM_KEY = 'roblox_editor_zoom_v1';
+const DEFAULT_CODE = 'print("Hello World")';
+
+let tabs = JSON.parse(localStorage.getItem(TABS_KEY)) || [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE }];
+let activeTabId = parseInt(localStorage.getItem(ACTIVE_ID_KEY)) || tabs[0].id;
+let currentFontSize = parseInt(localStorage.getItem(ZOOM_KEY)) || 16;
+let targetTabId = null;
+
+function updateIndicator() {
+    const activeTabEl = document.querySelector('.tab.active');
+    const indicator = document.getElementById('tab-indicator');
+    if (activeTabEl && indicator) {
+        indicator.style.width = activeTabEl.offsetWidth + 'px';
+        indicator.style.left = activeTabEl.offsetLeft + 'px';
+    }
+}
+
+function renderTabs() {
+    const container = document.getElementById('tabs-container');
+    container.innerHTML = '';
+    tabs.forEach(tab => {
+        const div = document.createElement('div');
+        div.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
+        div.innerHTML = `<span class="tab-name">${tab.name}</span>`;
+        
+        let pressTimer;
+        const startPress = (e) => {
+            const pos = e.touches ? e.touches[0] : e;
+            pressTimer = setTimeout(() => showTabMenu(tab.id, pos.clientX, pos.clientY), 600);
+        };
+        const endPress = () => clearTimeout(pressTimer);
+        
+        div.addEventListener('mousedown', startPress);
+        div.addEventListener('mouseup', endPress);
+        div.addEventListener('touchstart', startPress);
+        div.addEventListener('touchend', endPress);
+        div.onclick = () => window.switchTab(tab.id);
+        container.appendChild(div);
+    });
+    setTimeout(updateIndicator, 10);
+}
+
+// เรียก Render ทันทีที่อ่านถึงบรรทัดนี้
+renderTabs();
+
+/* ==========================================================
+   PWA & ENVIRONMENT DETECTION
+   ========================================================== */
+const getIsStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+if (getIsStandalone()) document.getElementById('install-app-btn')?.remove();
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
 <script>
 /* ==========================================================
-   ระบบ PWA AUTO UPDATE LOGIC (ฉบับความเร็วสูงสุด)
+   PWA AUTO UPDATE
    ========================================================== */
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').then(reg => {
-            // เช็คอัปเดตทันทีเมื่อเปิดแอป
             reg.update();
-
-            // เช็คอัปเดตทุกครั้งที่กลับมาเปิดหน้าเว็บ (Focus)
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') reg.update();
-            });
-
-            // ตรวจสอบทันทีว่ามีตัวใหม่รออยู่หรือไม่
-            if (reg.waiting) {
-                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            }
-
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update(); });
+            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
             reg.addEventListener('updatefound', () => {
                 const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
-                    // เมื่อไฟล์ใหม่โหลดลง Cache เสร็จสิ้น สั่งให้ระบบทำงานทันที
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                         newWorker.postMessage({ type: 'SKIP_WAITING' });
                     }
@@ -100,286 +265,242 @@ if ('serviceWorker' in navigator) {
             });
         });
     });
-
-    // รีเว็บไซต์ทันทีเมื่อมีการอัปเดตสำเร็จ
     let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-            window.location.reload();
-            refreshing = true;
-        }
-    });
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (!refreshing) { window.location.reload(); refreshing = true; } });
 }
 
 require.config({ paths:{vs:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs'} });
 
 require(['vs/editor/editor.main'],()=>{
 
-/* ==========================================================
-   MEGA ROBLOX API DATABASE (MASTER FULL VERSION)
-   ========================================================== */
 const API={
-  game:{
-    props:['Workspace','Players','Lighting','ReplicatedStorage','ServerStorage','StarterGui','StarterPack','RunService','TweenService','UserInputService','HttpService','DataStoreService','Debris','Teams','PathfindingService','CollectionService','MarketplaceService','TeleportService','Chat','SoundService','LogService','BadgeService','AssetService','AnalyticsService','SocialService'],
-    methods:['GetService','BindToClose','IsLoaded','Shutdown','IsAncestorOf','IsDescendantOf','GetObjects'],
-    desc: "Root of the game engine."
-  },
-  Workspace:{
-    props:['CurrentCamera','Terrain','Gravity','GlobalWind','FallenPartsDestroyHeight','StreamingEnabled','DistributedGameTime'],
-    methods:['Raycast','GetPartBoundsInBox','GetPartsInPart','GetPartBoundsInRadius','FindPartOnRay','FindPartOnRayWithIgnoreList','BulkMoveTo','GetRealtimeVelocityAtPoint'],
-    desc: "World container for physical objects."
-  },
-  Players:{
-    props:['LocalPlayer','MaxPlayers','RespawnTime','PlayerAdded','PlayerRemoving'],
-    methods:['GetPlayers','GetPlayerFromCharacter','GetNameFromUserIdAsync','GetUserIdFromNameAsync','GetUserThumbnailAsync','CreateHumanoidModelFromUserId','BanAsync','UnbanAsync'],
-    desc: "Service managing all players."
-  },
-  Lighting:{
-    props:['Ambient','Brightness','ColorShift_Bottom','ColorShift_Top','GlobalShadows','OutdoorAmbient','Outlines','ShadowSoftness','ClockTime','GeographicLatitude','ExposureCompensation','FogColor','FogEnd','FogStart','EnvironmentDiffuseScale','EnvironmentSpecularScale'],
-    methods:['SetMinutesAfterMidnight','GetMinutesAfterMidnight'],
-    desc: "Controls world appearance and time."
-  },
-  Instance:{
-    props:['Name','Parent','ClassName','Archivable'],
-    methods:['new','Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','GetPropertyChangedSignal','SetAttribute','GetAttribute','ClearAllChildren','IsDescendantOf','GetFullName','RemoveAttribute','GetAttributes'],
-    desc: "Base class for all objects."
-  },
-  Player:{
-    props:['Name','UserId','Character','Backpack','PlayerGui','Team','DisplayName','AccountAge','LocaleId','MembershipType','FollowUserId','RespawnLocation','CharacterAdded','CharacterRemoving'],
-    methods:['Kick','LoadCharacter','GetMouse','IsInGroup','GetRankInGroup','GetRoleInGroup','ClearCharacterAppearance','HasAppearanceLoaded','Move','SetCanSelfTerminate'],
-    desc: "Represents an individual user."
-  },
-  Humanoid:{
-    props:['Health','MaxHealth','WalkSpeed','JumpPower','JumpHeight','HipHeight','Sit','MoveDirection','PlatformStand','AutoRotate','UseJumpPower','DisplayName','HealthDisplayType','Died','StateChanged','ClimbSpeed','FloorMaterial'],
-    methods:['TakeDamage','Move','MoveTo','EquipTool','UnequipTools','ChangeState','GetState','LoadAnimation','AddCustomStatus','ApplyDescription'],
-    desc: "Controls character movements and health."
-  },
-  BasePart:{
-    props:['Anchored','CanCollide','CanTouch','CanQuery','Transparency','Reflectance','Color','Material','Position','Size','CFrame','Velocity','AssemblyLinearVelocity','AssemblyAngularVelocity','Mass','Orientation','Shape','Locked','CastShadow','CollisionGroup','PivotOffset','Touched','TouchEnded','Changed'],
-    methods:['ApplyImpulse','GetMass','SetNetworkOwner','GetNetworkOwner','BreakJoints','GetRootPart','GetConnectedParts','ApplyAngularImpulse','Resize','TranslateBy','Subtract','Union','Intersect'],
-    desc: "Physical objects in the 3D world."
-  },
-  TweenService:{props:[],methods:['Create','GetValue'], desc: "Service for property animations."},
-  RunService:{props:['Heartbeat','RenderStepped','Stepped'],methods:['IsClient','IsServer','IsStudio','IsRunning'], desc: "Manages the game loop."},
-  RemoteEvent:{props:['OnServerEvent','OnClientEvent'],methods:['FireServer','FireClient','FireAllClients'], desc: "Client-Server communication event."},
-  RemoteFunction:{props:['OnServerInvoke','OnClientInvoke'],methods:['InvokeServer','InvokeClient'], desc: "Client-Server request-response function."},
-  Sound:{props:['Playing','Paused','TimePosition','Volume','Pitch','PlaybackSpeed','Looped','SoundId','RollOffMaxDistance','RollOffMinDistance','RollOffMode','Ended','DidLoop'],methods:['Play','Stop','Pause','Resume'], desc: "Audio object."},
-  Camera:{props:['CFrame','Focus','FieldOfView','CameraType','ViewportSize','NearPlaneZ'],methods:['WorldToViewportPoint','WorldToScreenPoint','ViewportPointToRay','ScreenPointToRay'], desc: "Viewpoint for the local player."},
-  UserInputService:{props:['KeyboardEnabled','MouseEnabled','TouchEnabled','GamepadEnabled','AccelerometerEnabled','GyroscopeEnabled','InputBegan','InputEnded','InputChanged'],methods:['GetKeysPressed','IsKeyDown','IsMouseButtonPressed','GetFocusedTextBox'], desc: "Handles device inputs."},
-  HttpService:{props:['HttpEnabled'],methods:['GetAsync','PostAsync','JSONEncode','JSONDecode','GenerateGUID'], desc: "Handles network requests."},
-  Debris:{props:[],methods:['AddItem'], desc: "Handles timed object destruction."}
+  game:{props:['Workspace','Players','Lighting','ReplicatedStorage','ServerStorage','StarterGui','StarterPack','RunService','TweenService','UserInputService','HttpService','DataStoreService','Debris','Teams','PathfindingService','CollectionService','MarketplaceService','TeleportService','Chat','SoundService','LogService','BadgeService','AssetService','AnalyticsService','SocialService'],methods:['GetService','BindToClose','IsLoaded','Shutdown','IsAncestorOf','IsDescendantOf','GetObjects']},
+  Workspace:{props:['CurrentCamera','Terrain','Gravity','GlobalWind','FallenPartsDestroyHeight','StreamingEnabled','DistributedGameTime'],methods:['Raycast','GetPartBoundsInBox','GetPartsInPart','GetPartBoundsInRadius','FindPartOnRay','FindPartOnRayWithIgnoreList','BulkMoveTo','GetRealtimeVelocityAtPoint']},
+  Players:{props:['LocalPlayer','MaxPlayers','RespawnTime','PlayerAdded','PlayerRemoving'],methods:['GetPlayers','GetPlayerFromCharacter','GetNameFromUserIdAsync','GetUserIdFromNameAsync','GetUserThumbnailAsync','CreateHumanoidModelFromUserId','BanAsync','UnbanAsync']},
+  Lighting:{props:['Ambient','Brightness','ColorShift_Bottom','ColorShift_Top','GlobalShadows','OutdoorAmbient','Outlines','ShadowShadowSoftness','ClockTime','GeographicLatitude','ExposureCompensation','FogColor','FogEnd','FogStart','EnvironmentDiffuseScale','EnvironmentSpecularScale'],methods:['SetMinutesAfterMidnight','GetMinutesAfterMidnight']},
+  Instance:{props:['Name','Parent','ClassName','Archivable'],methods:['new','Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','GetPropertyChangedSignal','SetAttribute','GetAttribute','ClearAllChildren','IsDescendantOf','GetFullName','RemoveAttribute','GetAttributes']},
+  Player:{props:['Name','UserId','Character','Backpack','PlayerGui','Team','DisplayName','AccountAge','LocaleId','MembershipType','FollowUserId','RespawnLocation','CharacterAdded','CharacterRemoving'],methods:['Kick','LoadCharacter','GetMouse','IsInGroup','GetRankInGroup','GetRoleInGroup','ClearCharacterAppearance','HasAppearanceLoaded','Move','SetCanSelfTerminate']},
+  Humanoid:{props:['Health','MaxHealth','WalkSpeed','JumpPower','JumpHeight','HipHeight','Sit','MoveDirection','PlatformStand','AutoRotate','UseJumpPower','DisplayName','HealthDisplayType','Died','StateChanged','ClimbSpeed','FloorMaterial'],methods:['TakeDamage','Move','MoveTo','EquipTool','UnequipTools','ChangeState','GetState','LoadAnimation','AddCustomStatus','ApplyDescription']},
+  BasePart:{props:['Anchored','CanCollide','CanTouch','CanQuery','Transparency','Reflectance','Color','Material','Position','Size','CFrame','Velocity','AssemblyLinearVelocity','AssemblyAngularVelocity','Mass','Orientation','Shape','Locked','CastShadow','CollisionGroup','PivotOffset','Touched','TouchEnded','Changed'],methods:['ApplyImpulse','GetMass','SetNetworkOwner','GetNetworkOwner','BreakJoints','GetRootPart','GetConnectedParts','ApplyAngularImpulse','Resize','TranslateBy','Subtract','Union','Intersect']},
+  TweenService:{props:[],methods:['Create','GetValue']},
+  RunService:{props:['Heartbeat','RenderStepped','Stepped'],methods:['IsClient','IsServer','IsStudio','IsRunning']},
+  RemoteEvent:{props:['OnServerEvent','OnClientEvent'],methods:['FireServer','FireClient','FireAllClients']},
+  Sound:{props:['Playing','Paused','TimePosition','Volume','Pitch','PlaybackSpeed','Looped','SoundId'],methods:['Play','Stop','Pause','Resume']},
+  Camera:{props:['CFrame','Focus','FieldOfView','CameraType','ViewportSize','NearPlaneZ'],methods:['WorldToViewportPoint','WorldToScreenPoint','ViewportPointToRay','ScreenPointToRay']},
+  UserInputService:{props:['KeyboardEnabled','MouseEnabled','TouchEnabled','GamepadEnabled','AccelerometerEnabled','GyroscopeEnabled','InputBegan','InputEnded','InputChanged'],methods:['GetKeysPressed','IsKeyDown','IsMouseButtonPressed','GetFocusedTextBox']},
+  HttpService:{props:['HttpEnabled'],methods:['GetAsync','PostAsync','JSONEncode','JSONDecode','GenerateGUID']}
 };
-
 const DATA_TYPES={
-  Vector3:{props:['X','Y','Z','Magnitude','Unit'],methods:['Lerp','Dot','Cross','FuzzyEq','Max','Min'],static:['new','zero','one','xAxis','yAxis','zAxis'], desc: "3D Coordinate."},
-  Vector2:{props:['X','Y','Magnitude','Unit'],methods:['Lerp','Dot','Cross','FuzzyEq'],static:['new','zero','one'], desc: "2D Coordinate."},
-  CFrame:{props:['Position','LookVector','RightVector','UpVector','X','Y','Z','p'],methods:['Lerp','Inverse','ToObjectSpace','ToWorldSpace','ToEulerAnglesXYZ','ToOrientation','ToAxisAngle','GetComponents'],static:['new','Angles','lookAt','fromAxisAngle','fromMatrix','fromOrientation','fromEulerAnglesXYZ'], desc: "Coordinate Frame (Position + Rotation)."},
-  Color3:{props:['R','G','B'],methods:['ToHSV','Lerp'],static:['new','fromRGB','fromHSV','fromHex'], desc: "RGB Color."},
-  BrickColor:{props:['Name','Number','Color','r','g','b'],static:['new','Random','White','Black','Red','Blue','Green','Yellow','DarkGray','Gray','LightGray','palette'], desc: "Traditional color system based on names."},
-  UDim2:{props:['X','Y'],methods:['Lerp'],static:['new','fromScale','fromOffset'], desc: "UI 2D Coordinate (Scale + Offset)."},
-  UDim:{props:['Scale','Offset'],static:['new'], desc: "UI 1D Coordinate."},
-  TweenInfo:{props:['Time','EasingStyle','EasingDirection','RepeatCount','Reverses','DelayTime'],static:['new'], desc: "Tween parameters."},
-  Ray:{props:['Origin','Direction','Unit'],methods:['ClosestPoint','Distance'],static:['new'], desc: "An infinite line starting at a point."},
-  Region3:{props:['CFrame','Size'],methods:['ExpandToGrid'],static:['new'], desc: "A volume in 3D space."},
-  Rect:{props:['Min','Max','Width','Height'],static:['new'], desc: "A 2D rectangle."},
-  ColorSequence:{props:['Keypoints'],static:['new'], desc: "A gradient of colors."},
-  ColorSequenceKeypoint:{props:['Time','Value'],static:['new'], desc: "A point in a ColorSequence."},
-  NumberSequence:{props:['Keypoints'],static:['new'], desc: "A sequence of numbers."},
-  NumberSequenceKeypoint:{props:['Time','Value','Envelope'],static:['new'], desc: "A point in a NumberSequence."},
-  NumberRange:{props:['Min','Max'],static:['new'], desc: "A range between two numbers."},
-  DateTime:{props:['UnixTimestamp','UnixTimestampMillis'],methods:['FormatLocalTime','FormatUniversalTime','ToUniversalTime','ToLocalTime','ToISO8601'],static:['now','fromUnixTimestamp','fromUnixTimestampMillis','fromISO8601','fromLocalTime','fromUniversalTime'], desc: "An instant in time."},
-  PhysicalProperties:{props:['Density','Friction','Elasticity','FrictionWeight','ElasticityWeight'],static:['new'], desc: "Physics properties for a Part."},
-  Font:{props:['Family','Weight','Style','Bold'],static:['new','fromId','fromEnum'], desc: "Text font face."},
-  Axes:{props:['X','Y','Z','Top','Bottom','Left','Right','Back','Front'],static:['new'], desc: "Selection of 3D axes."},
-  Faces:{props:['Top','Bottom','Left','Right','Back','Front'],static:['new'], desc: "Selection of faces on a Cube."}
+  Vector3:{props:['X','Y','Z','Magnitude','Unit'],methods:['Lerp','Dot','Cross','FuzzyEq','Max','Min'],static:['new','zero','one','xAxis','yAxis','zAxis']},
+  CFrame:{props:['Position','LookVector','RightVector','UpVector','X','Y','Z','p'],methods:['Lerp','Inverse','ToObjectSpace','ToWorldSpace','ToEulerAnglesXYZ','ToOrientation','ToAxisAngle','GetComponents'],static:['new','Angles','lookAt','fromAxisAngle','fromMatrix','fromOrientation','fromEulerAnglesXYZ']},
+  Color3:{props:['R','G','B'],methods:['ToHSV','Lerp'],static:['new','fromRGB','fromHSV','fromHex']},
+  UDim2:{props:['X','Y'],methods:['Lerp'],static:['new','fromScale','fromOffset']},
+  DateTime:{props:['UnixTimestamp','UnixTimestampMillis'],methods:['FormatLocalTime','FormatUniversalTime','ToUniversalTime','ToISO8601'],static:['now','fromUnixTimestamp','fromISO8601']},
+  Ray:{props:['Origin','Direction','Unit'],methods:['ClosestPoint','Distance'],static:['new']},
+  Region3:{props:['CFrame','Size'],static:['new']},
+  Rect:{props:['Min','Max'],static:['new']},
+  Font:{props:['Family','Weight'],static:['new','fromId']},
+  Axes:{props:['X','Y','Z'],static:['new']},
+  Faces:{props:['Top','Bottom'],static:['new']}
 };
-
-const LUA_LIBS = {
-  table: { methods: ['insert', 'remove', 'sort', 'concat', 'find', 'create', 'clear', 'unpack', 'pack', 'move'] },
-  math: { methods: ['abs', 'acos', 'asin', 'atan', 'ceil', 'cos', 'deg', 'exp', 'floor', 'max', 'min', 'pow', 'rad', 'random', 'sin', 'sqrt', 'tan', 'clamp', 'huge', 'pi', 'noise', 'round', 'sign'] },
-  string: { methods: ['byte', 'char', 'find', 'format', 'gsub', 'len', 'lower', 'match', 'rep', 'split', 'sub', 'upper'] },
-  task: { methods: ['wait', 'spawn', 'defer', 'delay', 'cancel'] }
-};
-
-const GLOBAL_FUNCS = ['print', 'warn', 'error', 'wait', 'spawn', 'delay', 'tick', 'time', 'typeof', 'type', 'pairs', 'ipairs', 'pcall', 'xpcall', 'assert', 'require', 'tostring', 'tonumber','task','shared','_G'];
-
-const SNIPPETS = [
-  { label: 'if', insertText: 'if ${1:condition} then\n\t$0\nend', detail: 'if condition then' },
-  { label: 'ife', insertText: 'if ${1:condition} then\n\t$2\nelse\n\t$0\nend', detail: 'if-else statement' },
-  { label: 'fori', insertText: 'for ${1:i} = ${2:1}, ${3:10} do\n\t$0\nend', detail: 'numeric for loop' },
-  { label: 'forp', insertText: 'for ${1:i}, ${2:v} in pairs(${3:table}) do\n\t$0\nend', detail: 'for pairs loop' },
-  { label: 'while', insertText: 'while ${1:condition} do\n\t$0\nend', detail: 'while loop' },
-  { label: 'function', insertText: 'function ${1:name}(${2:params})\n\t$0\nend', detail: 'function declaration' },
-  { label: 'local', insertText: 'local ${1:name} = ${0:value}', detail: 'local variable' },
-  { label: 'ontouched', insertText: '${1:part}.Touched:Connect(function(${2:hit})\n\tlocal ${3:char} = ${2:hit}.Parent\n\tlocal ${4:hum} = ${3:char}:FindFirstChild("Humanoid")\n\tif ${4:hum} then\n\t\t$0\n\tend\nend)', detail: 'Touched event snippet' }
-];
-
+const LUA_LIBS={table:{methods:['insert','remove','sort','concat','find']},math:{methods:['abs','acos','asin','ceil','cos','deg','exp','floor','max','min','pow','rad','random','sin','sqrt','tan','clamp','huge','pi']},task:{methods:['wait','spawn','defer','delay','cancel']}};
+const GLOBAL_FUNCS=['print','warn','error','wait','spawn','delay','tick','time','typeof','type','pairs','ipairs','pcall','xpcall','assert','require','tostring','tonumber','task','shared','_G'];
+const SNIPPETS=[{label:'if',insertText:'if ${1:condition} then\n\t$0\nend'},{label:'function',insertText:'function ${1:name}(${2:params})\n\t$0\nend'},{label:'fori',insertText:'for ${1:i} = ${2:1}, ${3:10} do\n\t$0\nend'}];
 const LUA_KEYWORDS=['local','function','if','then','elseif','else','for','while','repeat','until','do','end','return','break','continue','and','or','not','true','false','nil','in'];
 const COMMON=['Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','Connect','Wait','Once','Disconnect','GetPropertyChangedSignal','SetAttribute','GetAttribute','IsDescendantOf','GetFullName'];
 
-/* ==========================================================
-   CORE ENGINE LOGIC
-   ========================================================== */
-let symbols={};
-function rebuildSymbols(text){
-  symbols={};
-  const lines=text.split('\n');
-  for(const l of lines){
-    let m;
-    if(m=l.match(/(?:\blocal\s+)?(\w+)\s*=\s*game:GetService\(["'](\w+)["']\)/i)) symbols[m[1]]=m[2];
-    else if(m=l.match(/(?:\blocal\s+)?(\w+)\s*=\s*Instance\.new\(["'](\w+)["']\)/i)) symbols[m[1]]=m[2];
-    else if(m=l.match(/(?:\blocal\s+)?(\w+)\s*=\s*(Vector3|Vector2|CFrame|Color3|UDim2|UDim|TweenInfo|BrickColor|DateTime|Ray|Region3|Rect|Font)\./i)) symbols[m[1]]=m[2];
-    else if(m=l.match(/(?:\blocal\s+)?(\w+)\s*=\s*.*LocalPlayer/i)) symbols[m[1]]='Player';
-    else if(m=l.match(/(?:function\s+)(?:[\w\.]+:)?(\w+)/i)) symbols[m[1]]='Function';
-  }
-}
-
-function resolveTypeFromChain(fullChain) {
-    if (!fullChain) return null;
-    if (fullChain.endsWith('.LocalPlayer')) return 'Player';
-    if (fullChain.endsWith('.Players') || fullChain.includes('GetService("Players")')) return 'Players';
-    if (fullChain.endsWith('.Workspace') || fullChain === 'game.Workspace' || fullChain === 'workspace') return 'Workspace';
-    const parts = fullChain.split(/[\.:]/);
-    const firstName = parts[0];
-    if (symbols[firstName]) {
-        if (parts.length === 1) return symbols[firstName];
-        if (symbols[firstName] === 'Player' && parts.includes('Character')) return 'BasePart';
-    }
-    return symbols[fullChain] || fullChain;
-}
-
-monaco.languages.registerHoverProvider('lua', {
-    provideHover: function (model, pos) {
-        const word = model.getWordAtPosition(pos);
-        if (!word) return null;
-        const name = word.word;
-        const type = symbols[name] || name;
-        let content = "";
-        if (API[type] && API[type].desc) content = `**Roblox Class: ${type}**\n\n${API[type].desc}`;
-        else if (DATA_TYPES[type] && DATA_TYPES[type].desc) content = `**Data Type: ${type}**\n\n${DATA_TYPES[type].desc}`;
-        if (content) return { range: new monaco.Range(pos.lineNumber, word.startColumn, pos.lineNumber, word.endColumn), contents: [{ value: content }] };
-        return null;
-    }
+const editor = monaco.editor.create(document.getElementById('container'), {
+    value: (tabs.find(t => t.id === activeTabId) || tabs[0]).content,
+    language: 'lua', theme: 'vs-dark', fontSize: currentFontSize, automaticLayout: true,
+    minimap: { enabled: false }, cursorSmoothCaretAnimation: true,
+    smoothScrolling: true, wordWrap: "on", fixedOverflowWidgets: true, links: false
 });
 
-monaco.languages.registerCompletionItemProvider('lua',{
-  triggerCharacters:['.',':', '"', "'"],
-  provideCompletionItems(model,pos){
-    const line=model.getLineContent(pos.lineNumber);
-    const before=line.slice(0,pos.column);
-    const word=model.getWordUntilPosition(pos);
-    const range={startLineNumber:pos.lineNumber,endLineNumber:pos.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn};
-    
-    const allText = model.getValue();
-    const wordsInDoc = allText.match(/\b[a-zA-Z_]\w*\b/g) || [];
-    const freqMap = {};
-    wordsInDoc.forEach(w => freqMap[w] = (freqMap[w] || 0) + 1);
+function saveState() {
+    localStorage.setItem(TABS_KEY, JSON.stringify(tabs));
+    localStorage.setItem(ACTIVE_ID_KEY, activeTabId.toString());
+    localStorage.setItem(ZOOM_KEY, currentFontSize.toString());
+}
 
-    const getPrioritySortText = (label) => {
-        const count = freqMap[label] || 0;
-        const score = 999999 - count;
-        return score.toString().padStart(7, '0') + "_" + label;
-    };
+document.getElementById('zoom-in-btn').onclick = () => adjustZoom(2);
+document.getElementById('zoom-out-btn').onclick = () => adjustZoom(-2);
 
-    const predefinedWords = new Set([...LUA_KEYWORDS, ...GLOBAL_FUNCS, ...COMMON, ...Object.keys(API), ...Object.keys(DATA_TYPES)]);
+function adjustZoom(amount) {
+    currentFontSize = Math.max(10, Math.min(40, currentFontSize + amount));
+    editor.updateOptions({ fontSize: currentFontSize });
+    saveState();
+}
 
-    const quoteMatch = before.match(/(:GetService|:IsA|\.new|:FindFirstChild|:WaitForChild)\s*\(\s*["']$/i);
-    if(quoteMatch){
-        const context = quoteMatch[1].toLowerCase();
-        let list = context.includes('getservice') ? API.game.props : Object.keys(API);
-        return { suggestions: list.map(item => ({ label: item, kind: monaco.languages.CompletionItemKind.Text, insertText: item, range: range, sortText: getPrioritySortText(item) })) };
+window.switchTab = (id) => {
+    if (id === activeTabId) return;
+    const oldIndex = tabs.findIndex(t => t.id === activeTabId);
+    const newIndex = tabs.findIndex(t => t.id === id);
+    const direction = newIndex > oldIndex ? 'left' : 'right';
+    const container = document.getElementById('container');
+    if(tabs[oldIndex]) tabs[oldIndex].content = editor.getValue();
+    container.className = direction === 'left' ? 'slide-left-out' : 'slide-right-out';
+    setTimeout(() => {
+        activeTabId = id;
+        editor.setValue(tabs[newIndex].content);
+        container.className = direction === 'left' ? 'slide-left-in' : 'slide-right-in';
+        saveState(); renderTabs();
+        setTimeout(() => { container.className = ''; }, 250);
+    }, 150);
+};
+
+document.getElementById('add-tab-btn').onclick = () => {
+    const cur = tabs.find(t => t.id === activeTabId);
+    if(cur) cur.content = editor.getValue();
+    const newId = Date.now();
+    tabs.push({ id: newId, name: `Script ${tabs.length + 1}`, content: DEFAULT_CODE });
+    activeTabId = newId;
+    const container = document.getElementById('container');
+    container.className = 'slide-left-out';
+    setTimeout(() => {
+        editor.setValue(DEFAULT_CODE);
+        container.className = 'slide-left-in';
+        saveState(); renderTabs();
+        setTimeout(() => { container.className = ''; }, 250);
+    }, 150);
+};
+
+/* --- Context Menu Logic --- */
+const menu = document.getElementById('tab-menu');
+const mainMenu = document.getElementById('main-menu-group');
+const renameSection = document.getElementById('rename-section');
+const renameInput = document.getElementById('inner-rename-input');
+
+window.showTabMenu = (id, x, y) => {
+    targetTabId = id;
+    mainMenu.style.display = 'block';
+    renameSection.style.display = 'none';
+    menu.style.display = 'block';
+    if (x + 200 > window.innerWidth) x -= 200;
+    menu.style.left = x + 'px'; menu.style.top = y + 'px';
+};
+
+document.addEventListener('mousedown', (e) => { if (!menu.contains(e.target)) menu.style.display = 'none'; });
+
+document.getElementById('menu-rename').onclick = () => {
+    const tab = tabs.find(t => t.id === targetTabId);
+    mainMenu.style.display = 'none';
+    renameSection.style.display = 'block';
+    renameInput.value = tab.name;
+    renameInput.focus(); renameInput.select();
+};
+
+document.getElementById('rename-cancel').onclick = (e) => {
+    e.stopPropagation(); mainMenu.style.display = 'block'; renameSection.style.display = 'none';
+};
+
+document.getElementById('rename-apply').onclick = (e) => {
+    e.stopPropagation();
+    const newName = renameInput.value.trim();
+    if (newName) {
+        tabs.find(t => t.id === targetTabId).name = newName;
+        saveState(); renderTabs();
     }
+    menu.style.display = 'none';
+};
 
-    const m=before.match(/([\w\.:"'\(\)]+)([\.:])$/);
-    if(m){
-      const fullChain=m[1]; const lastChar = m[2]; const type = resolveTypeFromChain(fullChain);
-      const colon = lastChar === ':';
-      
-      if(LUA_LIBS[type] && !colon){ 
-        return {suggestions: LUA_LIBS[type].methods.map(fn => ({label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, sortText: getPrioritySortText(fn)}))}; 
-      }
-      
-      if(DATA_TYPES[type]){ 
-          const d=DATA_TYPES[type]; const out=[]; 
-          if(!colon){ 
-              d.props.forEach(p=>out.push({label:p,kind:monaco.languages.CompletionItemKind.Property,insertText:p,range, sortText: getPrioritySortText(p)})); 
-              if(d.static) d.static.forEach(s=>out.push({label:s,kind:monaco.languages.CompletionItemKind.Function,insertText:s+'($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, sortText: getPrioritySortText(s)})); 
-          } 
-          if(d.methods) d.methods.forEach(fn=>out.push({label:fn,kind:monaco.languages.CompletionItemKind.Method,insertText:fn+'($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, sortText: getPrioritySortText(fn)})); 
-          return{suggestions:out}; 
-      }
-
-      if(type && API[type]){
-        const out=[]; if(!colon){ API[type].props.forEach(p=>out.push({label:p,kind:monaco.languages.CompletionItemKind.Property,insertText:p,range, sortText: getPrioritySortText(p)})); }
-        const methods = API[type].methods.concat(COMMON); 
-        [...new Set(methods)].forEach(fn=>out.push({label:fn,kind:monaco.languages.CompletionItemKind.Method,insertText:fn+'($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, sortText: getPrioritySortText(fn)})); 
-        return{suggestions:out};
-      }
+document.getElementById('menu-delete').onclick = () => {
+    menu.style.display = 'none';
+    tabs = tabs.filter(t => t.id !== targetTabId);
+    if (tabs.length === 0) tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE }];
+    if (activeTabId === targetTabId) {
+        activeTabId = tabs[0].id; editor.setValue(tabs[0].content);
     }
+    saveState(); renderTabs();
+};
 
-    const suggestions=[];
-    const uniqueWords = [...new Set(wordsInDoc)];
-    uniqueWords.forEach(w => {
-        if (!predefinedWords.has(w)) {
-            const isFunc = symbols[w] === 'Function';
-            suggestions.push({ label: w, kind: symbols[w] ? (isFunc ? monaco.languages.CompletionItemKind.Function : monaco.languages.CompletionItemKind.Variable) : monaco.languages.CompletionItemKind.Text, insertText: isFunc ? w + '($0)' : w, insertTextRules: isFunc ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet : undefined, range: range, sortText: getPrioritySortText(w) });
+document.getElementById('install-app-btn').onclick = async () => {
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') deferredPrompt = null;
+    }
+};
+
+editor.onDidChangeModelContent(() => {
+    const current = tabs.find(t => t.id === activeTabId);
+    if (current) { current.content = editor.getValue(); saveState(); }
+});
+
+/* --- Roblox IntelliSense Provider --- */
+monaco.languages.registerCompletionItemProvider('lua', {
+  triggerCharacters: ['.', ':', '"', "'"],
+  provideCompletionItems(model, pos) {
+    const line = model.getLineContent(pos.lineNumber);
+    const before = line.slice(0, pos.column);
+    const word = model.getWordUntilPosition(pos);
+    const range = { startLineNumber: pos.lineNumber, endLineNumber: pos.lineNumber, startColumn: word.startColumn, endColumn: word.endColumn };
+    const m = before.match(/([\w\.:"'\(\)]+)([\.:])$/);
+    if (m) {
+      const type = m[1]; const colon = m[2] === ':';
+      if (API[type]) {
+        const out = [];
+        if (!colon) API[type].props.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
+        API[type].methods.concat(COMMON).forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
+        return { suggestions: out };
+      }
+      if (DATA_TYPES[type]) {
+        const d = DATA_TYPES[type]; const out = [];
+        if (!colon) {
+            d.props.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
+            if (d.static) d.static.forEach(s => out.push({ label: s, kind: monaco.languages.CompletionItemKind.Method, insertText: s + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
         }
-    });
-
-    SNIPPETS.forEach(s => { suggestions.push({ label: s.label, kind: monaco.languages.CompletionItemKind.Snippet, insertText: s.insertText, insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range: range, sortText: getPrioritySortText(s.label) }); });
-    LUA_KEYWORDS.forEach(k=>suggestions.push({label:k,kind:monaco.languages.CompletionItemKind.Keyword,insertText:k,range, sortText: getPrioritySortText(k)}));
-    GLOBAL_FUNCS.forEach(f=>suggestions.push({label:f,kind:monaco.languages.CompletionItemKind.Function,insertText:f+'($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range, sortText: getPrioritySortText(f)}));
-    Object.keys(API).forEach(k=>suggestions.push({label:k,kind:monaco.languages.CompletionItemKind.Class,insertText:k,range, sortText: getPrioritySortText(k)}));
-    Object.keys(DATA_TYPES).forEach(k=>suggestions.push({label:k,kind:monaco.languages.CompletionItemKind.Struct,insertText:k,range, sortText: getPrioritySortText(k)}));
-    return{suggestions};
+        if (d.methods) d.methods.forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
+        return { suggestions: out };
+      }
+    }
+    const suggestions = [];
+    LUA_KEYWORDS.forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Keyword, insertText: k, range }));
+    GLOBAL_FUNCS.forEach(f => suggestions.push({ label: f, kind: monaco.languages.CompletionItemKind.Function, insertText: f + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
+    SNIPPETS.forEach(s => suggestions.push({ label: s.label, kind: monaco.languages.CompletionItemKind.Snippet, insertText: s.insertText, insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
+    Object.keys(API).forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Class, insertText: k, range }));
+    Object.keys(DATA_TYPES).forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Struct, insertText: k, range }));
+    return { suggestions };
   }
 });
 
-/* ==========================================================
-   EDITOR SETUP & PERSISTENCE
-   ========================================================== */
-const STORAGE_KEY = 'roblox_monaco_pro_persistence';
-const SCROLL_KEY = 'roblox_monaco_scroll_persistence';
-
-const editor=monaco.editor.create(document.getElementById('container'),{
-  // แสดงเวอร์ชันจาก CACHE_NAME ล่าสุด
-  value: localStorage.getItem(STORAGE_KEY) || `print("Hello World")`,
-  language:'lua', theme:'vs-dark', fontSize:16, automaticLayout: true, minimap:{enabled:true}, cursorSmoothCaretAnimation: true, smoothScrolling: true, wordWrap: "on", fixedOverflowWidgets: true, links: true
+// Monaco Menu Actions
+editor.addAction({ 
+    id: 'download-script', label: 'Download Current Tab (.txt)', contextMenuGroupId: 'navigation', 
+    run: (ed) => { 
+        const name = (tabs.find(t=>t.id===activeTabId).name) + ".txt"; 
+        const blob = new Blob([ed.getValue()], { type: 'text/plain' }); 
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href); 
+    } 
 });
 
-const savedScroll = JSON.parse(localStorage.getItem(SCROLL_KEY) || '{"top":0,"left":0}');
-setTimeout(() => { editor.setScrollTop(savedScroll.top); editor.setScrollLeft(savedScroll.left); }, 100);
-editor.onDidScrollChange(() => { localStorage.setItem(SCROLL_KEY, JSON.stringify({ top: editor.getScrollTop(), left: editor.getScrollLeft() })); });
-
-window.visualViewport.addEventListener('resize', () => { if (window.visualViewport.scale > 1) { document.body.style.zoom = 1 / window.visualViewport.scale; } });
-
-rebuildSymbols(editor.getValue());
-editor.onDidChangeModelContent(()=>{ 
-    const val = editor.getValue(); 
-    localStorage.setItem(STORAGE_KEY, val); 
-    rebuildSymbols(val); 
+editor.addAction({ 
+    id: 'load-script', label: 'Load Script from Device', contextMenuGroupId: 'navigation', 
+    run: () => {
+        const f = document.createElement('input'); f.type = 'file'; f.accept = '.lua, .txt';
+        f.onchange = (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            const r = new FileReader(); 
+            r.onload = (ev) => { 
+                const content = ev.target.result;
+                const cur = tabs.find(t => t.id === activeTabId);
+                if (cur) {
+                    cur.content = content; cur.name = file.name.split('.')[0]; 
+                    editor.setValue(content); renderTabs(); saveState();
+                }
+            }; 
+            r.readAsText(file);
+        };
+        f.click();
+    } 
 });
 
-/* ==========================================================
-   CONTEXT MENU ACTIONS
-   ========================================================== */
-editor.addAction({ id:'clear-all', label:'Clear All & Reset Editor', contextMenuGroupId:'navigation', run:(ed)=>{ed.setValue(""); localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(SCROLL_KEY); rebuildSymbols("");}});
+editor.addAction({ id: 'format', label: 'Format Document', contextMenuGroupId: 'navigation', keybindings: [monaco.KeyMod.Shift | monaco.KeyMod.Alt | monaco.KeyCode.KeyF], run: () => editor.getAction('editor.action.formatDocument').run() });
 
-editor.addAction({
-  id:'download-script', label:'Download Script (.txt)', contextMenuGroupId:'navigation',
-  run: (ed) => {
-    const now = new Date();
-    const pad = (n) => n.toString().padStart(2, '0');
-    const name = "Script_" + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds()) + ".txt";
-    const blob = new Blob([ed.getValue()], {type: 'text/plain'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
-  }
-});
-
-editor.addAction({ id:'format', label:'Format Document', keybindings:[monaco.KeyMod.Shift|monaco.KeyMod.Alt|monaco.KeyCode.KeyF], run:()=>editor.getAction('editor.action.formatDocument').run() });
-editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash, function() { editor.getAction('editor.action.commentLine').run(); });
-
+window.addEventListener('resize', updateIndicator);
 });
 </script>
 </body>
 </html>
+
