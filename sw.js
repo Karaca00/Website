@@ -1,5 +1,5 @@
 /* Service Worker Master v4.2 - Ultra-Fast Reactive Update */
-const CACHE_NAME = 'editor-v4.2.5'; 
+const CACHE_NAME = 'ZENU-HUB-v2.1.9'; 
 
 const ASSETS = [
   './',

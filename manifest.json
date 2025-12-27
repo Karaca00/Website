@@ -1,14 +1,14 @@
 {
-  "name": "Roblox Lua Editor",
-  "short_name": "RobloxIDE",
+  "name": "ZENU Editor",
+  "short_name": "ZENU IDE",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1e1e1e",
   "theme_color": "#1e1e1e",
-  "description": "Roblox Script Editor by karaca",
+  "description": "Roblox Script Editor by ZENU HUB",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/5968/5968313.png",
+      "src": "Z.png",
       "sizes": "512x512",
       "type": "image/png"
     }
