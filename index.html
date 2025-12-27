@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover, shrink-to-fit=no" />
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#121212">
-<title>Roblox IDE</title>
+<title>Editor IDE Master</title>
+
+<!-- Firebase Legacy SDKs -->
+<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
 
 <style>
 :root {
@@ -14,31 +19,36 @@
 }
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); overflow: hidden; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; -webkit-text-size-adjust: 100%; touch-action: none; }
 
+/* Animations */
 @keyframes slideDownHeader { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.slide-left-out { animation: slideLeftOut 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
-.slide-left-in { animation: slideLeftIn 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
-.slide-right-out { animation: slideRightOut 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
-.slide-right-in { animation: slideRightIn 0.25s forwards cubic-bezier(0.4, 0, 0.2, 1); }
-@keyframes slideLeftOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30px); opacity: 0; } }
-@keyframes slideLeftIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes slideRightOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(30px); opacity: 0; } }
-@keyframes slideRightIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.slide-left-out { animation: slideLeftOut 0.2s forwards; }
+.slide-left-in { animation: slideLeftIn 0.2s forwards; }
+@keyframes slideLeftOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-20px); opacity: 0; } }
+@keyframes slideLeftIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-#header { height: 52px; background: var(--bg-header); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--border); animation: slideDownHeader 0.7s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
+/* UI Parts */
+#header { height: 52px; background: var(--bg-header); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--border); animation: slideDownHeader 0.7s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
 .brand { color: var(--text-main); font-size: 14px; font-weight: 800; letter-spacing: 2px; }
-.controls { display: flex; align-items: center; gap: 12px; }
-#install-app-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--border); padding: 0 12px; height: 32px; border-radius: 8px; cursor: pointer; display: none; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; transition: all 0.2s; text-transform: uppercase; }
-#install-app-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.controls { display: flex; align-items: center; gap: 8px; }
+
+.header-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--border); padding: 0 10px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
+.header-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+#auth-btn { background: #333; border-color: #444; }
+
 .zoom-group { display: flex; gap: 4px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
-.zoom-btn { background: transparent; color: #fff; border: none; width: 32px; height: 32px; border-radius: 7px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-.zoom-btn:hover { background: var(--accent); }
+.zoom-btn { background: transparent; color: #fff; border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
 
 #tab-bar { height: 42px; background: #181818; display: flex; align-items: center; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; position: relative; }
 #tab-bar::-webkit-scrollbar { display: none; }
 #tabs-container { display: flex; height: 100%; position: relative; }
-.tab { height: 100%; display: flex; align-items: center; padding: 0 22px; color: var(--text-dim); font-size: 12px; cursor: pointer; background: transparent; border-right: 1px solid rgba(255,255,255,0.03); min-width: 100px; max-width: 200px; user-select: none; transition: color 0.3s; position: relative; z-index: 2; }
+
+.tab { height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 8px 0 18px; color: var(--text-dim); font-size: 12px; cursor: pointer; background: transparent; border-right: 1px solid rgba(255,255,255,0.03); min-width: 120px; max-width: 220px; user-select: none; transition: color 0.3s; position: relative; z-index: 2; }
 .tab.active { color: #fff; }
-.tab-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tab-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; margin-right: 8px; }
+
+.tab-options-btn { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #555; transition: 0.2s; flex-shrink: 0; }
+.tab-options-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
 #tab-indicator { position: absolute; bottom: 0; height: 3px; background: var(--accent); box-shadow: 0 -2px 10px var(--accent); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; border-radius: 3px 3px 0 0; }
 #add-tab-btn { padding: 0 16px; height: 100%; background: transparent; border: none; color: #555; font-size: 24px; cursor: pointer; transition: 0.3s; z-index: 10; }
 #add-tab-btn:hover { color: #fff; transform: scale(1.2); }
@@ -46,21 +56,18 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 #container-viewport { width: 100%; height: calc(100% - 94px); background: var(--bg-dark); overflow: hidden; position: relative; }
 #container { width: 100%; height: 100%; }
 
-#tab-menu { position: fixed; background: rgba(28, 28, 28, 0.98); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); padding: 8px; min-width: 200px; z-index: 10001; display: none; transform-origin: top left; }
-.menu-group { display: flex; flex-direction: column; gap: 4px; }
-.menu-item { padding: 12px 16px; color: #eee; font-size: 13px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+/* Modal System */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 99999; backdrop-filter: blur(10px); }
+.modal-box { background: var(--bg-panel); width: 300px; padding: 30px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 30px 80px rgba(0,0,0,0.9); }
+.modal-box h3 { margin: 0 0 25px; font-size: 15px; text-align: center; color: var(--accent); font-weight: 800; }
+.modal-box input { width: 100%; box-sizing: border-box; padding: 14px; margin-bottom: 15px; background: #121212; border: 1px solid #333; color: #fff; border-radius: 12px; outline: none; }
+
+#tab-menu { position: fixed; background: rgba(28, 28, 28, 0.98); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); padding: 8px; min-width: 180px; z-index: 10001; display: none; }
+.menu-item { padding: 10px 14px; color: #eee; font-size: 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
 .menu-item:hover { background: var(--accent); color: #fff; }
 .menu-item.danger:hover { background: #ff3b30; }
-.rename-ui { padding: 8px; display: none; }
-.rename-ui input { width: 100%; box-sizing: border-box; padding: 12px; background: #121212; border: 1px solid #444; color: #fff; border-radius: 8px; outline: none; font-size: 14px; margin-bottom: 12px; }
-.btn-row { display: flex; gap: 8px; }
-.btn-row button { flex: 1; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; }
-.btn-apply { background: var(--accent); color: #fff; }
-.btn-back { background: #333; color: #ccc; }
 
-/* แก้ไขให้รองรับการเลื่อนทั้ง 2 แนว */
 .monaco-editor .scroll-decoration { display: none; }
-.monaco-editor .inputarea.ime-input { font-size: 16px !important; }
 input, textarea { font-size: 16px !important; }
 @viewport { width: device-width; zoom: 1.0; }
 </style>
@@ -68,132 +75,184 @@ input, textarea { font-size: 16px !important; }
 
 <body>
 <div id="header">
-    <div class="brand">ROBLOX IDE</div>
+    <div class="brand">Editor MASTER</div>
     <div class="controls">
-        <button id="install-app-btn" title="Install App(Beta)"><span>📥</span> Install App</button>
+        <button id="auth-btn" class="header-btn" onclick="window.handleAccountAction()"><span>👤</span> LOGIN</button>
+        <button id="install-app-btn" class="header-btn" title="ติดตั้งแอป"><span>📥</span> INSTALL</button>
         <div class="zoom-group">
             <button class="zoom-btn" id="zoom-out-btn">−</button>
             <button class="zoom-btn" id="zoom-in-btn">+</button>
         </div>
     </div>
 </div>
-<div id="tab-bar">
-    <div id="tabs-container"></div>
-    <div id="tab-indicator"></div>
-    <button id="add-tab-btn">+</button>
-</div>
-<div id="container-viewport">
-    <div id="container"></div>
+<div id="tab-bar"><div id="tabs-container"></div><div id="tab-indicator"></div><button id="add-tab-btn">+</button></div>
+<div id="container-viewport"><div id="container"></div></div>
+
+<!-- Auth Modal -->
+<div id="auth-modal" class="modal-overlay" onclick="if(event.target==this) window.closeAuthModal()">
+    <div class="modal-box">
+        <h3 id="auth-title">SYNC WITH CLOUD</h3>
+        <input type="text" id="auth-user" placeholder="Username (Min 3 chars)">
+        <input type="password" id="auth-pass" placeholder="Password (Min 6 chars)">
+        <button class="btn-primary" style="width:100%; padding:14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:700; cursor:pointer;" onclick="window.handleAuth()">Confirm</button>
+        <button class="btn-secondary" style="width:100%; padding:10px; border:none; border-radius:8px; background:transparent; color:#777; cursor:pointer; font-size:11px; margin-top:5px;" id="auth-switch" onclick="window.switchAuthMode()">No account? Create one</button>
+        <button class="btn-secondary" style="width:100%; padding:10px; border:none; border-radius:8px; background:transparent; color:#777; cursor:pointer; font-size:11px;" onclick="window.closeAuthModal()">Cancel</button>
+    </div>
 </div>
 
+<!-- Tab Context Menu -->
 <div id="tab-menu">
-    <div class="menu-group" id="main-menu-group">
-        <div class="menu-item" id="menu-rename">Rename Script <span>✎</span></div>
-        <div class="menu-item danger" id="menu-delete">Delete Tab <span>🗑</span></div>
+    <div id="main-menu-group">
+        <div class="menu-item" id="menu-rename">Rename Script ✎</div>
+        <div class="menu-item danger" id="menu-delete">Delete Tab 🗑</div>
     </div>
-    <div class="rename-ui" id="rename-section">
-        <input type="text" id="inner-rename-input" spellcheck="false" autocomplete="off">
-        <div class="btn-row">
-            <button class="btn-back" id="rename-cancel">Back</button>
-            <button class="btn-apply" id="rename-apply">Save</button>
-        </div>
+    <div id="rename-section" style="display:none; padding:8px;">
+        <input type="text" id="inner-rename-input" style="width:100%; margin-bottom:10px; background:#121212; color:#fff; border:1px solid #444; padding:8px; border-radius:6px;">
+        <div style="display:flex; gap:5px;"><button id="rename-cancel" style="flex:1; padding:5px; background:#333; color:#fff; border:none; border-radius:4px;">Back</button><button id="rename-apply" style="flex:1; padding:5px; background:var(--accent); color:#fff; border:none; border-radius:4px;">Save</button></div>
     </div>
 </div>
 
 <script>
 /* ==========================================================
-   INSTANT UI & ENVIRONMENT RENDERER
+   FIREBASE CORE & SYNC LOGIC
    ========================================================== */
-const TABS_KEY = 'roblox_tabs_master_v21';
-const ACTIVE_ID_KEY = 'active_tab_id_v21';
-const ZOOM_KEY = 'roblox_editor_zoom_v1';
-const DEFAULT_CODE = 'print("Hello World")';
+const firebaseConfig = {
+    apiKey: "AIzaSyCdbYqWYST57jJRR2SBi05hFonp1AlK180",
+    authDomain: "webapp-karaca.firebaseapp.com",
+    projectId: "webapp-karaca",
+    storageBucket: "webapp-karaca.firebasestorage.app",
+    messagingSenderId: "244265873424",
+    appId: "1:244265873424:web:ad4c9f31b438a8c9c49a95",
+    measurementId: "G-9P9SFP89RC"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'roblox-ide-master';
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+let currentUser = null;
+let isRegisterMode = false;
+
+/* UI State Keys */
+const TABS_KEY = 'roblox_tabs_master_v32';
+const ACTIVE_ID_KEY = 'active_tab_id_v32';
+const ZOOM_KEY = 'roblox_master_zoom_v1';
+const DEFAULT_CODE = 'print("Hello Roblox Cloud")';
 
 let tabs = JSON.parse(localStorage.getItem(TABS_KEY)) || [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE }];
 let activeTabId = parseInt(localStorage.getItem(ACTIVE_ID_KEY)) || tabs[0].id;
 let currentFontSize = parseInt(localStorage.getItem(ZOOM_KEY)) || 16;
 let targetTabId = null;
-let deferredPrompt;
 
-function updateIndicator() {
-    const activeTabEl = document.querySelector('.tab.active');
-    const indicator = document.getElementById('tab-indicator');
-    if (activeTabEl && indicator) {
-        indicator.style.width = activeTabEl.offsetWidth + 'px';
-        indicator.style.left = activeTabEl.offsetLeft + 'px';
-    }
-}
+/* --- UI Handlers --- */
+window.updateIndicator = () => {
+    const el = document.querySelector('.tab.active');
+    const ind = document.getElementById('tab-indicator');
+    if (el && ind) { ind.style.width = el.offsetWidth + 'px'; ind.style.left = el.offsetLeft + 'px'; }
+};
 
-function renderTabs() {
+window.renderTabs = () => {
     const container = document.getElementById('tabs-container');
     container.innerHTML = '';
     tabs.forEach(tab => {
         const div = document.createElement('div');
         div.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
-        div.innerHTML = `<span class="tab-name">${tab.name}</span>`;
-        let pressTimer;
-        const startPress = (e) => {
-            const pos = e.touches ? e.touches[0] : e;
-            pressTimer = setTimeout(() => window.showTabMenu(tab.id, pos.clientX, pos.clientY), 600);
-        };
-        const endPress = () => clearTimeout(pressTimer);
-        div.addEventListener('mousedown', startPress); div.addEventListener('mouseup', endPress);
-        div.addEventListener('touchstart', startPress); div.addEventListener('touchend', endPress);
-        div.onclick = () => window.switchTab(tab.id);
+        div.innerHTML = `<span class="tab-name">${tab.name}</span><div class="tab-options-btn">≡</div>`;
+        div.onclick = (e) => { if(!e.target.classList.contains('tab-options-btn')) window.switchTab(tab.id); };
+        const optBtn = div.querySelector('.tab-options-btn');
+        optBtn.onclick = (e) => { e.stopPropagation(); const rect = optBtn.getBoundingClientRect(); window.showTabMenu(tab.id, rect.left - 150, rect.bottom + 5); };
         container.appendChild(div);
     });
-    setTimeout(updateIndicator, 10);
+    setTimeout(window.updateIndicator, 20);
+};
+
+/* --- ULTRA FAST UPDATE ENGINE --- */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(reg => {
+            reg.update(); // เช็คทันที
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') reg.update(); // เช็คเมื่อกลับมาที่แอป
+            });
+            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        });
+    });
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) { window.location.reload(); refreshing = true; } // รีโหลดทันทีที่เจอตัวใหม่
+    });
 }
+
+/* --- Auth Logic --- */
+window.handleAccountAction = () => {
+    if (currentUser) {
+        if (confirm(`User: ${currentUser.username}\nLogout and Clear Sync?`)) {
+            auth.signOut().then(() => { localStorage.clear(); window.location.reload(); });
+        }
+        return;
+    }
+    document.getElementById('auth-modal').style.display = 'flex';
+};
+window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
+window.switchAuthMode = () => {
+    isRegisterMode = !isRegisterMode;
+    document.getElementById('auth-title').innerText = isRegisterMode ? "CREATE CLOUD ACCOUNT" : "SYNC WITH CLOUD";
+    document.getElementById('auth-switch').innerText = isRegisterMode ? "Back to Login" : "No account? Create one";
+};
+window.handleAuth = async () => {
+    const userPart = document.getElementById('auth-user').value.trim();
+    const pass = document.getElementById('auth-pass').value;
+    if (userPart.length < 3 || pass.length < 6) return alert("User 3, Pass 6");
+    const email = `${userPart.toLowerCase()}@master.ide`;
+    try {
+        if (isRegisterMode) {
+            const res = await auth.createUserWithEmailAndPassword(email, pass);
+            await db.doc(`artifacts/${appId}/users/${res.user.uid}/data/state`).set({ tabs, activeTabId, lastSync: Date.now(), username: userPart });
+        } else {
+            await auth.signInWithEmailAndPassword(email, pass);
+        }
+        window.closeAuthModal();
+    } catch (e) { alert(e.message); }
+};
+
+auth.onAuthStateChanged(async (user) => {
+    const btn = document.getElementById('auth-btn');
+    if (user) {
+        currentUser = { uid: user.uid, username: user.email.split('@')[0] };
+        btn.innerHTML = `<span>👤</span> ${currentUser.username.toUpperCase()}`;
+        const doc = await db.doc(`artifacts/${appId}/users/${user.uid}/data/state`).get();
+        if (doc.exists) {
+            const data = doc.data();
+            tabs = data.tabs; activeTabId = data.activeTabId;
+            if (window.editorInstance) window.editorInstance.setValue(tabs.find(t => t.id === activeTabId).content);
+            window.renderTabs();
+        }
+    } else { currentUser = null; btn.innerHTML = `<span>👤</span> LOGIN`; }
+});
 
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 window.addEventListener('DOMContentLoaded', () => {
-    renderTabs();
+    window.renderTabs();
     if (isStandalone) document.getElementById('install-app-btn')?.remove();
-});
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); deferredPrompt = e;
-    if(!isStandalone) document.getElementById('install-app-btn').style.display = 'flex';
 });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
 <script>
-/* ==========================================================
-   ROBUST MONACO WORKER SETUP (Fixed Auto-Complete in Apps)
-   ========================================================== */
-const workerContent = `
+/* Monaco Engine (Internal Worker Fix for Apps) */
+const workerBlob = new Blob([`
     self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/' };
     importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/base/worker/workerMain.js');
-`;
-const workerBlob = new Blob([workerContent], { type: 'application/javascript' });
-
-window.MonacoEnvironment = {
-    getWorkerUrl: function() {
-        return URL.createObjectURL(workerBlob);
-    }
-};
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-        reg.update();
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') reg.update();
-        });
-        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-    });
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) { window.location.reload(); refreshing = true; }
-    });
-}
+`], { type: 'application/javascript' });
+window.MonacoEnvironment = { getWorkerUrl: () => URL.createObjectURL(workerBlob) };
 
 require.config({ paths:{vs:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs'} });
 
 require(['vs/editor/editor.main'],()=>{
-
 /* ==========================================================
-   ULTIMATE MEGA ROBLOX API DATABASE (MASTER FULL)
+   ULTIMATE MEGA ROBLOX API DATABASE (700+ Lines Uncut)
    ========================================================== */
 const API={
   game:{props:['Workspace','Players','Lighting','ReplicatedStorage','ServerStorage','StarterGui','StarterPack','RunService','TweenService','UserInputService','HttpService','DataStoreService','Debris','Teams','PathfindingService','CollectionService','MarketplaceService','TeleportService','Chat','SoundService','LogService','BadgeService','AssetService','AnalyticsService','SocialService','Selection','TestService','VRService','PolicyService','ProximityPromptService'],methods:['GetService','BindToClose','IsLoaded','Shutdown','IsAncestorOf','IsDescendantOf','GetObjects','FindService','GetJobsExtended','IsNetworkSettled','SetPlaceId','SetUniverseId']},
@@ -250,7 +309,8 @@ const LUA_LIBS={
   math:{methods:['abs','acos','asin','atan','atan2','ceil','cos','cosh','deg','exp','floor','fmod','frexp','ldexp','log','log10','max','min','modf','pow','rad','random','randomseed','sin','sinh','sqrt','tan','tanh','clamp','huge','pi','noise','round','sign']},
   string:{methods:['byte','char','find','format','gmatch','gsub','len','lower','match','rep','reverse','sub','upper','split','pack','unpack','packsize']},
   task:{methods:['wait','spawn','defer','delay','cancel','desynchronize','synchronize']},
-  os:{methods:['time','date','difftime','clock']}, utf8:{methods:['char','charpos','codes','codepoint','len','offset']},
+  os:{methods:['time','date','difftime','clock']},
+  utf8:{methods:['char','charpos','codes','codepoint','len','offset']},
   coroutine:{methods:['create','resume','running','status','wrap','yield','close','isyieldable']},
   debug:{methods:['traceback','profilebegin','profileend']}
 };
@@ -271,132 +331,90 @@ const SNIPPETS=[
 const LUA_KEYWORDS=['local','function','if','then','elseif','else','for','while','repeat','until','do','end','return','break','continue','and','or','not','true','false','nil','in'];
 const COMMON=['Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','Connect','Wait','Once','Disconnect','GetPropertyChangedSignal','SetAttribute','GetAttribute','IsDescendantOf','GetFullName','FindFirstAncestor'];
 
-/* ==========================================================
-   MONACO EDITOR INSTANCE (Configured for Both Vertical & Horizontal Scroll)
-   ========================================================== */
-const editor = monaco.editor.create(document.getElementById('container'), {
+window.editorInstance = monaco.editor.create(document.getElementById('container'), {
     value: (tabs.find(t => t.id === activeTabId) || tabs[0]).content,
     language: 'lua', theme: 'vs-dark', fontSize: currentFontSize, automaticLayout: true,
-    minimap: { enabled: true }, cursorSmoothCaretAnimation: true,
-    smoothScrolling: true, 
-    // แก้ไขให้ Scroll ได้ทั้งแนวตั้งและแนวนอน
-    wordWrap: "off", 
-    scrollbar: {
-        vertical: 'visible',
-        horizontal: 'visible',
-        useShadows: true,
-        verticalHasArrows: true,
-        horizontalHasArrows: true,
-        verticalScrollbarSize: 10,
-        horizontalScrollbarSize: 10
-    },
-    fixedOverflowWidgets: true, 
-    links: true,
-    quickSuggestions: { other: true, comments: false, strings: true },
-    suggestOnTriggerCharacters: true, parameterHints: { enabled: true },
+    minimap: { enabled: true }, cursorSmoothCaretAnimation: true, smoothScrolling: true,
+    wordWrap: "off", scrollbar: { vertical: 'visible', horizontal: 'visible', verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
+    fixedOverflowWidgets: true, quickSuggestions: true, suggestOnTriggerCharacters: true,
     tabCompletion: "on", snippetSuggestions: "top"
 });
 
-function saveState() {
+async function saveState() {
     localStorage.setItem(TABS_KEY, JSON.stringify(tabs));
     localStorage.setItem(ACTIVE_ID_KEY, activeTabId.toString());
     localStorage.setItem(ZOOM_KEY, currentFontSize.toString());
+    if (currentUser) {
+        try {
+            await db.doc(`artifacts/${appId}/users/${currentUser.uid}/data/state`).set({ tabs, activeTabId, lastSync: Date.now() }, { merge: true });
+        } catch (e) { console.error("Sync error", e); }
+    }
 }
 
-document.getElementById('zoom-in-btn').onclick = () => adjustZoom(2);
-document.getElementById('zoom-out-btn').onclick = () => adjustZoom(-2);
-
-function adjustZoom(amount) {
-    currentFontSize = Math.max(10, Math.min(40, currentFontSize + amount));
-    editor.updateOptions({ fontSize: currentFontSize }); saveState();
-}
+document.getElementById('zoom-in-btn').onclick = () => { currentFontSize += 2; window.editorInstance.updateOptions({fontSize:currentFontSize}); saveState(); };
+document.getElementById('zoom-out-btn').onclick = () => { currentFontSize -= 2; window.editorInstance.updateOptions({fontSize:currentFontSize}); saveState(); };
 
 window.switchTab = (id) => {
     if (id === activeTabId) return;
     const oldIndex = tabs.findIndex(t => t.id === activeTabId);
     const newIndex = tabs.findIndex(t => t.id === id);
-    const direction = newIndex > oldIndex ? 'left' : 'right';
+    if(tabs[oldIndex]) tabs[oldIndex].content = window.editorInstance.getValue();
     const container = document.getElementById('container');
-    if(tabs[oldIndex]) tabs[oldIndex].content = editor.getValue();
-    container.className = direction === 'left' ? 'slide-left-out' : 'slide-right-out';
+    container.className = 'slide-left-out';
     setTimeout(() => {
-        activeTabId = id; editor.setValue(tabs[newIndex].content);
-        container.className = direction === 'left' ? 'slide-left-in' : 'slide-right-in';
-        saveState(); renderTabs();
-        setTimeout(() => { container.className = ''; }, 250);
+        activeTabId = id; window.editorInstance.setValue(tabs[newIndex].content);
+        container.className = 'slide-left-in';
+        saveState(); window.renderTabs();
+        setTimeout(() => { container.className = ''; }, 200);
     }, 150);
 };
 
 document.getElementById('add-tab-btn').onclick = () => {
     const cur = tabs.find(t => t.id === activeTabId);
-    if(cur) cur.content = editor.getValue();
+    if(cur) cur.content = window.editorInstance.getValue();
     const newId = Date.now();
     tabs.push({ id: newId, name: `Script ${tabs.length + 1}`, content: DEFAULT_CODE });
-    activeTabId = newId;
-    const container = document.getElementById('container');
-    container.className = 'slide-left-out';
-    setTimeout(() => {
-        editor.setValue(DEFAULT_CODE); container.className = 'slide-left-in';
-        saveState(); renderTabs();
-        setTimeout(() => { container.className = ''; }, 250);
-    }, 150);
+    activeTabId = newId; window.editorInstance.setValue(DEFAULT_CODE); window.renderTabs(); saveState();
 };
 
-const menu = document.getElementById('tab-menu');
-const mainMenu = document.getElementById('main-menu-group');
-const renameSection = document.getElementById('rename-section');
-const renameInput = document.getElementById('inner-rename-input');
+window.editorInstance.onDidChangeModelContent(() => {
+    const current = tabs.find(t => t.id === activeTabId);
+    if (current) { current.content = window.editorInstance.getValue(); saveState(); }
+});
 
+/* Context Menu Logic */
+const menu = document.getElementById('tab-menu');
 window.showTabMenu = (id, x, y) => {
-    targetTabId = id; mainMenu.style.display = 'block'; renameSection.style.display = 'none';
+    targetTabId = id;
+    document.getElementById('main-menu-group').style.display = 'block';
+    document.getElementById('rename-section').style.display = 'none';
     menu.style.display = 'block';
-    if (x + 200 > window.innerWidth) x -= 200;
+    if (x + 180 > window.innerWidth) x -= 180;
     menu.style.left = x + 'px'; menu.style.top = y + 'px';
 };
-
 document.addEventListener('mousedown', (e) => { if (!menu.contains(e.target)) menu.style.display = 'none'; });
 
 document.getElementById('menu-rename').onclick = () => {
+    document.getElementById('main-menu-group').style.display = 'none';
+    document.getElementById('rename-section').style.display = 'block';
     const tab = tabs.find(t => t.id === targetTabId);
-    mainMenu.style.display = 'none'; renameSection.style.display = 'block';
-    renameInput.value = tab.name; renameInput.focus(); renameInput.select();
+    document.getElementById('inner-rename-input').value = tab.name;
+    document.getElementById('inner-rename-input').focus();
 };
-
-document.getElementById('rename-cancel').onclick = (e) => {
-    e.stopPropagation(); mainMenu.style.display = 'block'; renameSection.style.display = 'none';
-};
-
+document.getElementById('rename-cancel').onclick = (e) => { e.stopPropagation(); document.getElementById('main-menu-group').style.display = 'block'; document.getElementById('rename-section').style.display = 'none'; };
 document.getElementById('rename-apply').onclick = (e) => {
-    e.stopPropagation();
-    const newName = renameInput.value.trim();
-    if (newName) {
-        tabs.find(t => t.id === targetTabId).name = newName;
-        saveState(); renderTabs();
-    }
+    e.stopPropagation(); const name = document.getElementById('inner-rename-input').value.trim();
+    if (name) { tabs.find(t => t.id === targetTabId).name = name; saveState(); window.renderTabs(); }
     menu.style.display = 'none';
 };
-
 document.getElementById('menu-delete').onclick = () => {
-    menu.style.display = 'none';
-    tabs = tabs.filter(t => t.id !== targetTabId);
+    menu.style.display = 'none'; tabs = tabs.filter(t => t.id !== targetTabId);
     if (tabs.length === 0) tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE }];
-    if (activeTabId === targetTabId) { activeTabId = tabs[0].id; editor.setValue(tabs[0].content); }
-    saveState(); renderTabs();
+    if (activeTabId === targetTabId) { activeTabId = tabs[0].id; window.editorInstance.setValue(tabs[0].content); }
+    saveState(); window.renderTabs();
 };
 
-document.getElementById('install-app-btn').onclick = async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') deferredPrompt = null;
-    }
-};
-
-editor.onDidChangeModelContent(() => {
-    const current = tabs.find(t => t.id === activeTabId);
-    if (current) { current.content = editor.getValue(); saveState(); }
-});
-
+/* Ultimate Completion Provider */
 monaco.languages.registerCompletionItemProvider('lua', {
   triggerCharacters: ['.', ':', '"', "'"],
   provideCompletionItems(model, pos) {
@@ -405,27 +423,24 @@ monaco.languages.registerCompletionItemProvider('lua', {
     const line = model.getLineContent(pos.lineNumber);
     const before = line.slice(0, pos.column);
     const m = before.match(/([\w\.:"'\(\)]+)([\.:])$/);
-    
     if (m) {
       const type = m[1]; const colon = m[2] === ':';
       if (API[type]) {
-        const out = [];
-        if (!colon) API[type].props.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
+        const out = []; if (!colon) API[type].props.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
         API[type].methods.concat(COMMON).forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
         return { suggestions: out };
       }
       if (DATA_TYPES[type]) {
         const d = DATA_TYPES[type]; const out = [];
         if (!colon) {
-            d.props.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
-            if (d.static) d.static.forEach(s => out.push({ label: s, kind: monaco.languages.CompletionItemKind.Method, insertText: s + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
+            d.props?.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
+            d.static?.forEach(s => out.push({ label: s, kind: monaco.languages.CompletionItemKind.Method, insertText: s + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
         }
-        if (d.methods) d.methods.forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
+        d.methods?.forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
         return { suggestions: out };
       }
       if (LUA_LIBS[type] && !colon) return { suggestions: LUA_LIBS[type].methods.map(fn => ({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range })) };
     }
-    
     const suggestions = [];
     LUA_KEYWORDS.forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Keyword, insertText: k, range }));
     GLOBAL_FUNCS.forEach(f => suggestions.push({ label: f, kind: monaco.languages.CompletionItemKind.Function, insertText: f + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
@@ -436,12 +451,25 @@ monaco.languages.registerCompletionItemProvider('lua', {
   }
 });
 
-editor.addAction({ id: 'download-script', label: 'Download Current Tab (.txt)', contextMenuGroupId: 'navigation', run: (ed) => { const name = (tabs.find(t=>t.id===activeTabId).name) + ".txt"; const blob = new Blob([ed.getValue()], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href); } });
-editor.addAction({ id: 'load-script', label: 'Load Script from Device', contextMenuGroupId: 'navigation', run: () => { const f = document.createElement('input'); f.type = 'file'; f.accept = '.lua, .txt'; f.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { const content = ev.target.result; const cur = tabs.find(t => t.id === activeTabId); if (cur) { cur.content = content; cur.name = file.name.split('.')[0]; editor.setValue(content); renderTabs(); saveState(); } }; r.readAsText(file); }; f.click(); } });
-editor.addAction({ id: 'format', label: 'Format Document', contextMenuGroupId: 'navigation', keybindings: [monaco.KeyMod.Shift | monaco.KeyMod.Alt | monaco.KeyCode.KeyF], run: () => editor.getAction('editor.action.formatDocument').run() });
+window.editorInstance.addAction({ id: 'download', label: 'Download Script (.txt)', contextMenuGroupId: 'navigation', run: (ed) => { const name = (tabs.find(t=>t.id===activeTabId).name) + ".txt"; const blob = new Blob([ed.getValue()], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); } });
+window.editorInstance.addAction({ id: 'load-script', label: 'Load Script from Device', contextMenuGroupId: 'navigation', run: () => {
+    const f = document.createElement('input'); f.type = 'file'; f.accept = '.lua, .txt';
+    f.onchange = (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const r = new FileReader(); r.onload = (ev) => { 
+            const cur = tabs.find(t => t.id === activeTabId);
+            if (cur) { cur.content = ev.target.result; cur.name = file.name.split('.')[0]; window.editorInstance.setValue(cur.content); window.renderTabs(); saveState(); }
+        }; r.readAsText(file);
+    }; f.click();
+}});
+window.editorInstance.addAction({ id: 'format', label: 'Format Document', contextMenuGroupId: 'navigation', run: () => window.editorInstance.getAction('editor.action.formatDocument').run() });
 
-window.addEventListener('resize', updateIndicator);
+window.addEventListener('resize', window.updateIndicator);
 });
+
+let defPrompt;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); defPrompt = e; if(!isStandalone) document.getElementById('install-app-btn').style.display = 'flex'; });
+document.getElementById('install-app-btn').onclick = async () => { if (defPrompt) { defPrompt.prompt(); const { outcome } = await defPrompt.userChoice; if (outcome === 'accepted') defPrompt = null; } };
 </script>
 </body>
 </html>
