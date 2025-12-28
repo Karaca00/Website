@@ -29,106 +29,31 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 
 /* Animations */
 @keyframes slideDownHeader { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slideUpToast { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-/* UPDATED: Super Bright Neon Pulse */
+/* Neon Pulse */
 @keyframes neonPulse {
-  0%, 100% { 
-    text-shadow: 
-      0 0 5px rgba(255, 0, 0, 0.8), 
-      0 0 10px rgba(255, 0, 0, 0.5),
-      0 0 20px rgba(255, 0, 0, 0.3);
-    opacity: 0.95; 
-  }
-  50% { 
-    text-shadow: 
-      0 0 10px #ff0000, 
-      0 0 20px #ff0000, 
-      0 0 40px #ff0000,
-      0 0 60px rgba(255, 0, 0, 0.8),
-      0 0 80px rgba(255, 0, 0, 0.5);
-    opacity: 1; 
-    filter: brightness(1.2);
-  }
+  0%, 100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.6), 0 0 10px rgba(255, 0, 0, 0.3); opacity: 0.95; }
+  50% { text-shadow: 0 0 10px #ff0000, 0 0 20px rgba(255, 0, 0, 0.5); opacity: 1; filter: brightness(1.1); }
 }
 
-/* Directional Sliding Animations */
+/* Directional Animations */
+.anim-next-out { animation: slideOutToLeft 0.2s forwards; } .anim-next-in { animation: slideInFromRight 0.2s forwards; }
+.anim-prev-out { animation: slideOutToRight 0.2s forwards; } .anim-prev-in { animation: slideInFromLeft 0.2s forwards; }
 @keyframes slideOutToLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30px); opacity: 0; } }
 @keyframes slideInFromRight { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes slideOutToRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(30px); opacity: 0; } }
 @keyframes slideInFromLeft { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-.anim-next-out { animation: slideOutToLeft 0.2s cubic-bezier(0.2, 0.0, 0.2, 1) forwards; }
-.anim-next-in { animation: slideInFromRight 0.2s cubic-bezier(0.2, 0.0, 0.2, 1) forwards; }
-.anim-prev-out { animation: slideOutToRight 0.2s cubic-bezier(0.2, 0.0, 0.2, 1) forwards; }
-.anim-prev-in { animation: slideInFromLeft 0.2s cubic-bezier(0.2, 0.0, 0.2, 1) forwards; }
-
-/* Header Design Update */
-#header { 
-    height: 60px; 
-    background: var(--bg-header); 
-    backdrop-filter: blur(20px); 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    padding: 0 20px; 
-    border-bottom: 1px solid #1a1a1a; 
-    animation: slideDownHeader 0.7s cubic-bezier(0.16, 1, 0.3, 1); 
-    z-index: 1000; 
-}
-
-.brand-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    line-height: 1;
-}
-
-.brand { 
-    color: var(--text-main); 
-    font-size: 20px; 
-    font-weight: 900; 
-    letter-spacing: 1px; 
-    font-style: italic; 
-    animation: neonPulse 2s infinite ease-in-out;
-}
-
-.brandes { 
-    color: var(--accent); 
-    font-size: 10px; 
-    font-weight: 700; 
-    letter-spacing: 6px; 
-    margin-left: 2px;
-    animation: neonPulse 2s infinite ease-in-out reverse;
-}
-
+/* Layout */
+#header { height: 60px; background: var(--bg-header); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #1a1a1a; animation: slideDownHeader 0.7s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
+.brand-container { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; line-height: 1; }
+.brand { color: var(--text-main); font-size: 20px; font-weight: 900; letter-spacing: 1px; font-style: italic; animation: neonPulse 2s infinite ease-in-out; }
+.brandes { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 6px; margin-left: 2px; animation: neonPulse 2s infinite ease-in-out reverse; }
 .controls { display: flex; align-items: center; gap: 8px; }
 
-.header-btn { 
-    background: #000; 
-    color: var(--text-main); 
-    border: 1px solid var(--border); 
-    padding: 0 12px; 
-    height: 34px; 
-    border-radius: 6px; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    font-size: 11px; 
-    font-weight: 700; 
-    transition: all 0.2s; 
-    text-transform: uppercase; 
-    white-space: nowrap; 
-}
-
-.header-btn:hover { 
-    background: var(--accent); 
-    border-color: var(--accent); 
-    color: #fff; 
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
-}
-
+.header-btn { background: #000; color: var(--text-main); border: 1px solid var(--border); padding: 0 12px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
+.header-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
 #auth-btn { background: #1a1a1a; border-color: #333; }
 
 .zoom-group { display: flex; gap: 4px; background: #000; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
@@ -138,33 +63,12 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 #tab-bar { height: 42px; background: #080808; display: flex; align-items: center; border-bottom: 1px solid #222; overflow-x: auto; scrollbar-width: none; position: relative; scroll-behavior: smooth; }
 #tab-bar::-webkit-scrollbar { display: none; }
 #tabs-container { display: flex; height: 100%; position: relative; }
-
-.tab { 
-    height: 100%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    padding: 0 10px 0 18px; 
-    color: var(--text-dim); 
-    font-size: 12px; 
-    cursor: pointer; 
-    background: transparent; 
-    border-right: 1px solid rgba(255,255,255,0.05); 
-    min-width: 120px; 
-    max-width: 220px; 
-    user-select: none; 
-    transition: all 0.3s; 
-    position: relative; 
-    z-index: 2; 
-    font-family: 'Segoe UI', sans-serif;
-}
+.tab { height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 10px 0 18px; color: var(--text-dim); font-size: 12px; cursor: pointer; background: transparent; border-right: 1px solid rgba(255,255,255,0.05); min-width: 120px; max-width: 220px; user-select: none; transition: all 0.3s; position: relative; z-index: 2; font-family: 'Segoe UI', sans-serif; }
 .tab:hover { color: #fff; background: rgba(255,255,255,0.02); }
 .tab.active { color: #fff; background: rgba(255, 0, 0, 0.05); }
 .tab-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; margin-right: 8px; font-weight: 500; }
-
 .tab-options-btn { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: #555; transition: 0.2s; flex-shrink: 0; }
 .tab-options-btn:hover { background: var(--accent); color: #fff; }
-
 #tab-indicator { position: absolute; bottom: 0; height: 2px; background: var(--accent); box-shadow: 0 -2px 10px var(--accent); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; }
 #add-tab-btn { padding: 0 16px; height: 100%; background: transparent; border: none; color: #555; font-size: 24px; cursor: pointer; transition: 0.3s; z-index: 10; }
 #add-tab-btn:hover { color: var(--accent); transform: scale(1.1); text-shadow: 0 0 10px var(--accent); }
@@ -172,7 +76,10 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 #container-viewport { width: 100%; height: calc(100% - 102px); background: var(--bg-dark); overflow: hidden; position: relative; }
 #container { width: 100%; height: 100%; }
 
-/* Modal System */
+/* Version Indicator */
+#version-tag { position: fixed; bottom: 5px; right: 10px; color: #333; font-size: 10px; font-weight: bold; pointer-events: none; z-index: 9999; opacity: 0.5; }
+
+/* Modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 99999; backdrop-filter: blur(5px); }
 .modal-box { background: #0a0a0a; width: 300px; padding: 30px; border-radius: 16px; border: 1px solid #333; box-shadow: 0 0 40px rgba(255,0,0,0.1); }
 .modal-box h3 { margin: 0 0 25px; font-size: 18px; text-align: center; color: #fff; font-weight: 900; letter-spacing: 1px; }
@@ -187,7 +94,6 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 .monaco-editor .scroll-decoration { display: none; }
 .monaco-editor .slider { background: #333 !important; border-radius: 4px !important; }
 .monaco-editor .slider:hover { background: #555 !important; }
-
 input, textarea { font-size: 16px !important; }
 @viewport { width: device-width; zoom: 1.0; }
 </style>
@@ -211,6 +117,7 @@ input, textarea { font-size: 16px !important; }
 </div>
 <div id="tab-bar"><div id="tabs-container"></div><div id="tab-indicator"></div><button id="add-tab-btn">+</button></div>
 <div id="container-viewport"><div id="container"></div></div>
+<div id="version-tag">v3.2</div>
 
 <!-- Auth Modal -->
 <div id="auth-modal" class="modal-overlay" onclick="if(event.target==this) window.closeAuthModal()">
@@ -238,7 +145,7 @@ input, textarea { font-size: 16px !important; }
 
 <script>
 /* ==========================================================
-   FIREBASE CORE & SYNC LOGIC
+   FIREBASE CORE & CONFIG
    ========================================================== */
 const firebaseConfig = {
     apiKey: "AIzaSyCdbYqWYST57jJRR2SBi05hFonp1AlK180",
@@ -254,20 +161,21 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'roblox-ide-master';
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+db.enablePersistence({ synchronizeTabs: true }).catch(err => console.log(err.code));
 
 let currentUser = null;
 let isRegisterMode = false;
+let saveDebounceTimer = null; 
 
 /* UI State Keys */
 const TABS_KEY = 'roblox_tabs_master_v32';
 const ACTIVE_ID_KEY = 'active_tab_id_v32';
-const ZOOM_KEY = 'roblox_master_zoom_v1';
 const DEFAULT_CODE = 'print("Hello World")';
 
-let tabs = JSON.parse(localStorage.getItem(TABS_KEY)) || [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE }];
+/* Initial Load - Always from LocalStorage (Guest Mode) */
+let tabs = JSON.parse(localStorage.getItem(TABS_KEY)) || [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, viewState: null, fontSize: 16 }];
 let activeTabId = parseInt(localStorage.getItem(ACTIVE_ID_KEY)) || tabs[0].id;
-let currentFontSize = parseInt(localStorage.getItem(ZOOM_KEY)) || 16;
+tabs = tabs.map(t => ({...t, fontSize: t.fontSize || 16}));
 let targetTabId = null;
 
 /* --- UI Handlers --- */
@@ -296,48 +204,116 @@ window.renderTabs = () => {
     setTimeout(window.updateIndicator, 100);
 };
 
-/* --- ULTRA FAST UPDATE ENGINE --- */
+/* --- SYSTEM SAVE LOGIC (Exclusive Paths) --- */
+async function saveCore(isClosing = false) {
+    const currentTab = tabs.find(t => t.id === activeTabId);
+    if (currentTab && window.editorInstance) {
+        currentTab.content = window.editorInstance.getValue();
+        currentTab.viewState = window.editorInstance.saveViewState(); 
+    }
+
+    if (currentUser) {
+        const userRef = db.doc(`artifacts/${appId}/users/${currentUser.uid}/data/state`);
+        const payload = { tabs, activeTabId, lastSync: Date.now() };
+        try {
+            const cleanPayload = JSON.parse(JSON.stringify(payload));
+            await userRef.set(cleanPayload, { merge: true });
+            if(!isClosing) console.log("Saved to Cloud");
+        } catch(e) { console.error("Cloud Save Failed", e); }
+    } else {
+        localStorage.setItem(TABS_KEY, JSON.stringify(tabs));
+        localStorage.setItem(ACTIVE_ID_KEY, activeTabId.toString());
+        if(!isClosing) console.log("Saved to Device");
+    }
+}
+
+function saveState() {
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(() => saveCore(false), 1000);
+}
+
+window.addEventListener('beforeunload', () => saveCore(true));
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveCore(true);
+});
+
+/* --- INTELLIGENT AUTO-UPDATE SYSTEM (v3.2 Logic) --- */
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').then(reg => {
-            reg.update(); 
+            reg.update();
+            setInterval(() => reg.update(), 5 * 60 * 1000); // Check every 5 mins
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') reg.update();
             });
-            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
         });
     });
+
     let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) { window.location.reload(); refreshing = true; }
+    navigator.serviceWorker.addEventListener('controllerchange', async () => {
+        if (!refreshing) {
+            refreshing = true;
+            console.log("New version detected! Saving and reloading...");
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:linear-gradient(45deg, #00ce09, #00ff88); color:black; padding:15px 30px; border-radius:50px; z-index:100000; font-weight:900; box-shadow:0 10px 30px rgba(0,255,0,0.3); font-size:14px; animation: slideUpToast 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display:flex; align-items:center; gap:10px;";
+            toast.innerHTML = "<span>🚀</span> UPDATING ZENU HUB...";
+            document.body.appendChild(toast);
+
+            await saveCore(true);
+            setTimeout(() => window.location.reload(), 2000);
+        }
     });
 }
 
-/* --- Auth Logic --- */
+/* --- Auth & Data Loading Logic --- */
 window.handleAccountAction = () => {
     if (currentUser) {
-        if (confirm(`User: ${currentUser.username}\nLogout and Clear Sync?`)) {
-            auth.signOut().then(() => { localStorage.clear(); window.location.reload(); });
+        if (confirm(`User: ${currentUser.username}\nLogout and Switch to Local Storage?`)) {
+            saveCore(true);
+            auth.signOut().then(() => {
+                const localTabs = JSON.parse(localStorage.getItem(TABS_KEY));
+                const localId = parseInt(localStorage.getItem(ACTIVE_ID_KEY));
+                if (localTabs) {
+                    tabs = localTabs.map(t => ({...t, fontSize: t.fontSize || 16}));
+                    activeTabId = localId || tabs[0].id;
+                } else {
+                    tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }];
+                    activeTabId = tabs[0].id;
+                }
+                window.refreshEditorState();
+                window.renderTabs();
+            });
         }
         return;
     }
     document.getElementById('auth-modal').style.display = 'flex';
 };
+
 window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
 window.switchAuthMode = () => {
     isRegisterMode = !isRegisterMode;
     document.getElementById('auth-title').innerText = isRegisterMode ? "CREATE CLOUD ACCOUNT" : "SYNC WITH CLOUD";
     document.getElementById('auth-switch').innerText = isRegisterMode ? "Back to Login" : "No account? Create one";
 };
+
 window.handleAuth = async () => {
     const userPart = document.getElementById('auth-user').value.trim();
     const pass = document.getElementById('auth-pass').value;
-    if (userPart.length < 3 || pass.length < 6) return alert("User 3, Pass 6");
+    if (userPart.length < 3 || pass.length < 6) return alert("Username must be 3+ chars, Password 6+");
     const email = `${userPart.toLowerCase()}@master.ide`;
+    const usernameId = userPart.toLowerCase();
+
     try {
         if (isRegisterMode) {
+            const usernameDoc = await db.doc(`artifacts/${appId}/usernames/${usernameId}`).get();
+            if (usernameDoc.exists) return alert("Username taken.");
             const res = await auth.createUserWithEmailAndPassword(email, pass);
-            await db.doc(`artifacts/${appId}/users/${res.user.uid}/data/state`).set({ tabs, activeTabId, lastSync: Date.now(), username: userPart });
+            const batch = db.batch();
+            const cleanTabs = JSON.parse(JSON.stringify(tabs));
+            batch.set(db.doc(`artifacts/${appId}/users/${res.user.uid}/data/state`), { tabs: cleanTabs, activeTabId, lastSync: Date.now(), username: userPart });
+            batch.set(db.doc(`artifacts/${appId}/usernames/${usernameId}`), { uid: res.user.uid });
+            await batch.commit();
         } else {
             await auth.signInWithEmailAndPassword(email, pass);
         }
@@ -350,15 +326,36 @@ auth.onAuthStateChanged(async (user) => {
     if (user) {
         currentUser = { uid: user.uid, username: user.email.split('@')[0] };
         btn.innerHTML = `<span>👤</span> ${currentUser.username.toUpperCase()}`;
-        const doc = await db.doc(`artifacts/${appId}/users/${user.uid}/data/state`).get();
-        if (doc.exists) {
-            const data = doc.data();
-            tabs = data.tabs; activeTabId = data.activeTabId;
-            if (window.editorInstance) window.editorInstance.setValue(tabs.find(t => t.id === activeTabId).content);
-            window.renderTabs();
-        }
-    } else { currentUser = null; btn.innerHTML = `<span>👤</span> LOGIN`; }
+        try {
+            const doc = await db.doc(`artifacts/${appId}/users/${user.uid}/data/state`).get();
+            if (doc.exists) {
+                const data = doc.data();
+                if (data.tabs) tabs = data.tabs.map(t => ({...t, fontSize: t.fontSize || 16}));
+                activeTabId = data.activeTabId || activeTabId;
+                window.refreshEditorState();
+                window.renderTabs();
+            }
+        } catch(e) { console.error("Fetch Error", e); }
+    } else { 
+        currentUser = null; 
+        btn.innerHTML = `<span>👤</span> LOGIN`; 
+    }
 });
+
+window.refreshEditorState = () => {
+    if (!window.editorInstance) return;
+    const currentTab = tabs.find(t => t.id === activeTabId);
+    if (currentTab) {
+        window.editorInstance.updateOptions({ fontSize: currentTab.fontSize || 16 });
+        window.editorInstance.setValue(currentTab.content);
+        if (currentTab.viewState) {
+            window.editorInstance.restoreViewState(currentTab.viewState);
+        } else {
+            window.editorInstance.setScrollTop(0);
+        }
+        window.editorInstance.focus();
+    }
+};
 
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 window.addEventListener('DOMContentLoaded', () => {
@@ -369,7 +366,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
 <script>
-/* Monaco Engine (Internal Worker Fix for Apps) */
+/* Monaco Engine */
 const workerBlob = new Blob([`
     self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/' };
     importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/base/worker/workerMain.js');
@@ -383,12 +380,11 @@ require(['vs/editor/editor.main'],()=>{
 /* ==========================================================
    ULTIMATE ROBLOX API & DATA TYPES (EXPANDED MASTER)
    ========================================================== */
-const COMMON = ['Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','Connect','Wait','Once','Disconnect','GetPropertyChangedSignal','SetAttribute','GetAttribute','IsDescendantOf','GetFullName','FindFirstAncestor','FindFirstAncestorOfClass','FindFirstChildOfClass','ClearAllChildren'];
+const COMMON = ['Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','Connect','Wait','Once','Disconnect','GetPropertyChangedSignal','SetAttribute','GetAttribute','IsDescendantOf','GetFullName','FindFirstAncestor','FindFirstAncestorOfClass','FindFirstChildOfClass','ClearAllChildren','GetActor','GetAttributes','RemoveAttribute'];
 
 const API = {
-  // Services & Global Objects
   game: {
-    props: ['Workspace','Players','Lighting','ReplicatedStorage','ServerStorage','StarterGui','StarterPack','RunService','TweenService','UserInputService','HttpService','DataStoreService','Debris','Teams','PathfindingService','CollectionService','MarketplaceService','TeleportService','Chat','SoundService','LogService','BadgeService','AssetService','AnalyticsService','SocialService','Selection','TestService','VRService','PolicyService','ProximityPromptService','ContextActionService','ContentProvider','PhysicsService','ScriptContext','Stats','TextService','GroupService','MemStorageService','GuiService','StarterPlayer'],
+    props: ['Workspace','Players','Lighting','ReplicatedStorage','ServerStorage','ServerScriptService','StarterGui','StarterPack','RunService','TweenService','UserInputService','HttpService','DataStoreService','Debris','Teams','PathfindingService','CollectionService','MarketplaceService','TeleportService','Chat','SoundService','LogService','BadgeService','AssetService','AnalyticsService','SocialService','Selection','TestService','VRService','PolicyService','ProximityPromptService','ContextActionService','ContentProvider','PhysicsService','ScriptContext','Stats','TextService','GroupService','MemStorageService','GuiService','StarterPlayer','LocalizationService','VoiceChatService'],
     methods: ['GetService','BindToClose','IsLoaded','Shutdown','IsAncestorOf','IsDescendantOf','GetObjects','FindService','GetJobsExtended','IsNetworkSettled','SetPlaceId','SetUniverseId','DefineFastFlag','GetFastFlag']
   },
   Workspace: {
@@ -409,10 +405,9 @@ const API = {
   },
   ReplicatedStorage: { props: [], methods: [] },
   ServerStorage: { props: [], methods: [] },
+  ServerScriptService: { props: [], methods: [] },
   StarterGui: { props: ['ScreenGui','ResetPlayerGuiOnSpawn'], methods: ['SetCore','GetCore','SetCoreGuiEnabled','GetCoreGuiEnabled'] },
   StarterPack: { props: [], methods: [] },
-  
-  // Instance Classes
   Instance: {
     props: ['Name','Parent','ClassName','Archivable'],
     methods: ['new','Destroy','Clone','FindFirstChild','WaitForChild','GetChildren','GetDescendants','IsA','GetPropertyChangedSignal','SetAttribute','GetAttribute','ClearAllChildren','IsDescendantOf','GetFullName','RemoveAttribute','GetAttributes','FindFirstAncestor','FindFirstAncestorOfClass','FindFirstAncestorWhichIsA','FindFirstChildOfClass','FindFirstChildWhichIsA','GetActor','DebugId']
@@ -433,8 +428,6 @@ const API = {
     props: ['CFrame','Focus','FieldOfView','CameraType','ViewportSize','NearPlaneZ','HeadLocked','HeadScale','CameraSubject','DiagonalFieldOfView','MaxAxisFieldOfView'],
     methods: ['WorldToViewportPoint','WorldToScreenPoint','ViewportPointToRay','ScreenPointToRay','GetLargestCutoffDistance','GetRenderCFrame','Interpolate']
   },
-  
-  // UI Classes
   GuiObject: { props: ['Active','AnchorPoint','BackgroundColor3','BackgroundTransparency','BorderColor3','BorderSizePixel','ClipsDescendants','Draggable','LayoutOrder','Position','Rotation','Size','Visible','ZIndex','MouseEnter','MouseLeave','InputBegan','InputEnded'], methods: ['TweenPosition','TweenSize','TweenSizeAndPosition'] },
   ScreenGui: { props: ['DisplayOrder','Enabled','IgnoreGuiInset','ResetOnSpawn','ZIndexBehavior'], methods: [] },
   Frame: { props: ['Style'], methods: [] },
@@ -444,13 +437,9 @@ const API = {
   ImageLabel: { props: ['Image','ImageColor3','ImageRectOffset','ImageRectSize','ImageTransparency','ScaleType','SliceCenter','TileSize'], methods: [] },
   ImageButton: { props: ['Image','ImageColor3','ImageRectOffset','ImageRectSize','ImageTransparency','ScaleType','SliceCenter','TileSize','MouseButton1Click','MouseButton1Down','MouseButton1Up'], methods: [] },
   ScrollingFrame: { props: ['CanvasPosition','CanvasSize','ElasticBehavior','HorizontalScrollBarInset','ScrollBarImageColor3','ScrollBarImageTransparency','ScrollBarThickness','ScrollingDirection','VerticalScrollBarInset','VerticalScrollBarPosition'], methods: [] },
-  
-  // Animation & Audio
   Animation: { props: ['AnimationId'], methods: [] },
   AnimationTrack: { props: ['IsPlaying','Length','Looped','Priority','Speed','TimePosition','WeightTarget','KeyframeReached','Stopped'], methods: ['Play','Stop','AdjustSpeed','AdjustWeight','GetTimeOfKeyframe'] },
   Sound: { props: ['SoundId','Playing','Looped','Volume','PlaybackSpeed','TimePosition','RollOffMaxDistance','RollOffMinDistance','RollOffMode','IsLoaded','IsPaused','TimeLength','Ended','DidLoop'], methods: ['Play','Stop','Pause','Resume'] },
-  
-  // Services Extended
   TweenService: { props: [], methods: ['Create','GetValue'] },
   RunService: { props: ['Heartbeat','RenderStepped','Stepped'], methods: ['IsClient','IsServer','IsStudio','IsRunning','BindToRenderStep','UnbindFromRenderStep','IsEdit','IsRunMode'] },
   HttpService: { props: ['HttpEnabled'], methods: ['GetAsync','PostAsync','JSONEncode','JSONDecode','GenerateGUID','UrlEncode','RequestAsync'] },
@@ -471,7 +460,10 @@ const API = {
   Debris: { methods: ['AddItem'] },
   LogService: { methods: ['GetLogHistory','RequestServerLog','MessageOut'] },
   BadgeService: { methods: ['GetBadgeInfoAsync','AwardBadge','UserHasBadgeAsync'] },
-  ProximityPrompt: { props: ['ActionText','ObjectText','HoldDuration','KeyboardKeyCode','MaxActivationDistance','RequiresLineOfSight','Style','Triggered','PromptButtonHoldBegan','PromptButtonHoldEnded'], methods: ['InputHoldBegin','InputHoldEnd'] }
+  ProximityPrompt: { props: ['ActionText','ObjectText','HoldDuration','KeyboardKeyCode','MaxActivationDistance','RequiresLineOfSight','Style','Triggered','PromptButtonHoldBegan','PromptButtonHoldEnded'], methods: ['InputHoldBegin','InputHoldEnd'] },
+  Teams: { methods: ['GetTeams'] },
+  Team: { props: ['TeamColor','AutoAssignable'] },
+  StarterPlayer: { props: ['NameDisplayDistance','HealthDisplayDistance','CharacterUseJumpPower'] }
 };
 
 const DATA_TYPES = {
@@ -502,22 +494,31 @@ const DATA_TYPES = {
   DockWidgetPluginGuiInfo: { static: ['new'] },
   PathWaypoint: { props: ['Action','Position','Label'], static: ['new'] },
   Random: { methods: ['NextInteger','NextNumber','Clone'], static: ['new'] },
-  Enum: { props: ['KeyCode','RenderPriority','Material','SortOrder','Font','TextXAlignment','TextYAlignment','UserInputType','UserInputState','ContextActionPriority','EasingStyle','EasingDirection','CameraType','HttpContentType','ThreadPoolConfig','QualityLevel'] }
+  Enum: { props: ['KeyCode','RenderPriority','Material','SortOrder','Font','TextXAlignment','TextYAlignment','UserInputType','UserInputState','ContextActionPriority','EasingStyle','EasingDirection','CameraType','HttpContentType','ThreadPoolConfig','QualityLevel','RaycastFilterType','PathWaypointAction'] }
 };
 
 const LUA_LIBS = {
-  table: { methods: ['insert','remove','sort','concat','find','create','clear','unpack','pack','move','freeze','isfrozen','getn','foreach','foreachi'] },
+  table: { methods: ['insert','remove','sort','concat','find','create','clear','unpack','pack','move','freeze','isfrozen','getn','foreach','foreachi','clone','maxn'] },
   math: { methods: ['abs','acos','asin','atan','atan2','ceil','cos','cosh','deg','exp','floor','fmod','frexp','ldexp','log','log10','max','min','modf','pow','rad','random','randomseed','sin','sinh','sqrt','tan','tanh','clamp','huge','pi','noise','round','sign'] },
   string: { methods: ['byte','char','find','format','gmatch','gsub','len','lower','match','rep','reverse','sub','upper','split','pack','unpack','packsize'] },
   task: { methods: ['wait','spawn','defer','delay','cancel','desynchronize','synchronize'] },
   os: { methods: ['time','date','difftime','clock'] },
   utf8: { methods: ['char','charpos','codes','codepoint','len','offset','graphemes','nfcnormalize','nfdnormalize'] },
   coroutine: { methods: ['create','resume','running','status','wrap','yield','close','isyieldable'] },
-  debug: { methods: ['traceback','profilebegin','profileend','getmemorycategory','setmemorycategory','info','dump','load','getupvalue','setupvalue','getconstant','getproto','setstack'] },
-  bit32: { methods: ['arshift','band','bnot','bor','btest','bxor','countlz','countrz','extract','lrotate','lshift','replace','rrotate','rshift'] }
+  debug: { methods: ['traceback','profilebegin','profileend','getmemorycategory','setmemorycategory','info','dump','load','getupvalue','setupvalue','getconstant','getproto','setstack','setconstant','getconstants','getprotos','getregistry','setmetatable','getmetatable'] },
+  bit32: { methods: ['arshift','band','bnot','bor','btest','bxor','countlz','countrz','extract','lrotate','lshift','replace','rrotate','rshift'] },
+  buffer: { methods: ['create','fromstring','tostring','copy','fill','readi8','readu8','readi16','readu16','readi32','readu32','readf32','readf64','writei8','writeu8','writei16','writeu16','writei32','writeu32','writef32','writef64','len'] },
+  vector: { methods: ['create','magnitude','normalize','cross','dot','angle','min','max','ceil','floor','sign','abs'] },
+  SharedTable: { methods: ['new','clear','clone','increment','update'] },
+  crypt: { methods: ['base64encode','base64decode','encrypt','decrypt','generatebytes','generatekey','hash'] },
+  Drawing: { methods: ['new','Fonts','clear'] },
+  WebSocket: { methods: ['connect'] },
+  rconsole: { methods: ['print','info','warn','err','clear','name','input'] },
+  cache: { methods: ['invalidate','replace','iscached'] },
+  lz4: { methods: ['compress','decompress'] }
 };
 
-const GLOBAL_FUNCS = ['print','warn','error','wait','spawn','delay','tick','time','typeof','type','pairs','ipairs','pcall','xpcall','assert','require','tostring','tonumber','task','shared','_G','getfenv','setfenv','next','rawget','rawset','rawequal','select','gcinfo','collectgarbage','newproxy','ypcall','getgenv','getrenv','getsenv','getreg','getgc','getinstances','getnilinstances','getloadedmodules','getconnections','firesignal','fireclickdetector','fireproximityprompt','firetouchinterest','isnetworkowner','gethiddenproperty','sethiddenproperty','setsimulationradius'];
+const GLOBAL_FUNCS = ['print','warn','error','wait','spawn','delay','tick','time','typeof','type','pairs','ipairs','pcall','xpcall','assert','require','tostring','tonumber','task','shared','_G','getfenv','setfenv','next','rawget','rawset','rawequal','select','gcinfo','collectgarbage','newproxy','ypcall','getgenv','getrenv','getsenv','getreg','getgc','getinstances','getnilinstances','getloadedmodules','getconnections','firesignal','fireclickdetector','fireproximityprompt','firetouchinterest','isnetworkowner','gethiddenproperty','sethiddenproperty','setsimulationradius','settings','UserSettings','elapsedTime','version','printidentity','gethui','getrunningscripts','readfile','writefile','appendfile','loadfile','listfiles','isfile','isfolder','makefolder','delfolder','delfile','setclipboard','setfpscap','mouse1click','mouse1press','mouse1release','mouse2click','mouse2press','mouse2release','keypress','keyrelease','loadstring','identifyexecutor','getexecutorname','queue_on_teleport','request','http_request','clonefunction','checkcaller','hookfunction','hookmetamethod','newcclosure','replaceclosure','setreadonly','isreadonly','make_writeable','make_readonly','is_writeable','getproperties'];
 
 const SNIPPETS = [
   {label:'if',insertText:'if ${1:condition} then\n\t$0\nend'},
@@ -535,49 +536,63 @@ const SNIPPETS = [
   {label:'tween',insertText:'local TweenService = game:GetService("TweenService")\nlocal info = TweenInfo.new(${1:1}, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)\nlocal tween = TweenService:Create(${2:object}, info, {${3:Property} = ${4:Value}})\ntween:Play()'},
   {label:'pcall',insertText:'local success, result = pcall(function()\n\t$0\nend)'},
   {label:'module',insertText:'local module = {}\n\nfunction module.${1:funcName}()\n\t$0\nend\n\nreturn module'},
-  {label:'bindaction',insertText:'local ContextActionService = game:GetService("ContextActionService")\n\nlocal function handleAction(actionName, inputState, inputObject)\n\tif inputState == Enum.UserInputState.Begin then\n\t\t$0\n\tend\nend\n\nContextActionService:BindAction("${1:ActionName}", handleAction, true, Enum.KeyCode.${2:E})'}
+  {label:'bindaction',insertText:'local ContextActionService = game:GetService("ContextActionService")\n\nlocal function handleAction(actionName, inputState, inputObject)\n\tif inputState == Enum.UserInputState.Begin then\n\t\t$0\n\tend\nend\n\nContextActionService:BindAction("${1:ActionName}", handleAction, true, Enum.KeyCode.${2:E})'},
+  {label:'taskspawn',insertText:'task.spawn(function()\n\t$0\nend)'},
+  {label:'connection',insertText:'local connection\nconnection = ${1:Signal}:Connect(function()\n\t$0\n\tconnection:Disconnect()\nend)'},
+  {label:'service',insertText:'local ${1:Service} = game:GetService("${1:Service}")'}
 ];
 
-const LUA_KEYWORDS=['local','function','if','then','elseif','else','for','while','repeat','until','do','end','return','break','continue','and','or','not','true','false','nil','in'];
+const LUA_KEYWORDS=['local','function','if','then','elseif','else','for','while','repeat','until','do','end','return','break','continue','and','or','not','true','false','nil','in','export','type'];
 
-/* Prepare Exclusion Set for Smarter Auto-Complete */
-const KNOWN_WORDS = new Set([
-    ...LUA_KEYWORDS,
-    ...GLOBAL_FUNCS,
-    ...Object.keys(API),
-    ...Object.keys(DATA_TYPES),
-    ...Object.keys(LUA_LIBS)
-]);
+const KNOWN_WORDS = new Set([ ...LUA_KEYWORDS, ...GLOBAL_FUNCS, ...Object.keys(API), ...Object.keys(DATA_TYPES), ...Object.keys(LUA_LIBS) ]);
 
+// Initialize with font size from the active tab
+const startTab = tabs.find(t => t.id === activeTabId) || tabs[0];
 window.editorInstance = monaco.editor.create(document.getElementById('container'), {
-    value: (tabs.find(t => t.id === activeTabId) || tabs[0]).content,
-    language: 'lua', theme: 'vs-dark', fontSize: currentFontSize, automaticLayout: true,
+    value: startTab.content,
+    language: 'lua', theme: 'vs-dark', 
+    fontSize: startTab.fontSize || 16, // Use per-tab font size
+    automaticLayout: true,
     minimap: { enabled: true }, cursorSmoothCaretAnimation: true, smoothScrolling: true,
     wordWrap: "off", scrollbar: { vertical: 'visible', horizontal: 'visible', verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
     fixedOverflowWidgets: true, quickSuggestions: true, suggestOnTriggerCharacters: true,
-    tabCompletion: "on", snippetSuggestions: "top"
+    tabCompletion: "on", snippetSuggestions: "top",
+    wordBasedSuggestions: false // Disable default to use our smart custom provider
 });
 
-async function saveState() {
-    localStorage.setItem(TABS_KEY, JSON.stringify(tabs));
-    localStorage.setItem(ACTIVE_ID_KEY, activeTabId.toString());
-    localStorage.setItem(ZOOM_KEY, currentFontSize.toString());
-    if (currentUser) {
-        try {
-            await db.doc(`artifacts/${appId}/users/${currentUser.uid}/data/state`).set({ tabs, activeTabId, lastSync: Date.now() }, { merge: true });
-        } catch (e) { console.error("Sync error", e); }
+// Restore Initial State if available
+if(startTab && startTab.viewState) { window.editorInstance.restoreViewState(startTab.viewState); }
+
+// Zoom Buttons - Update PER TAB
+document.getElementById('zoom-in-btn').onclick = () => { 
+    const cur = tabs.find(t => t.id === activeTabId);
+    if(cur) {
+        cur.fontSize = (cur.fontSize || 16) + 2;
+        window.editorInstance.updateOptions({fontSize: cur.fontSize}); 
+        saveCore(); 
     }
-}
+};
+document.getElementById('zoom-out-btn').onclick = () => { 
+    const cur = tabs.find(t => t.id === activeTabId);
+    if(cur) {
+        cur.fontSize = Math.max(6, (cur.fontSize || 16) - 2); // Prevent too small
+        window.editorInstance.updateOptions({fontSize: cur.fontSize}); 
+        saveCore(); 
+    }
+};
 
-document.getElementById('zoom-in-btn').onclick = () => { currentFontSize += 2; window.editorInstance.updateOptions({fontSize:currentFontSize}); saveState(); };
-document.getElementById('zoom-out-btn').onclick = () => { currentFontSize -= 2; window.editorInstance.updateOptions({fontSize:currentFontSize}); saveState(); };
-
-/* Smart Tab Switching Logic */
+/* Smart Tab Switching with State Capture */
 window.switchTab = (id) => {
     if (id === activeTabId) return;
     const oldIndex = tabs.findIndex(t => t.id === activeTabId);
     const newIndex = tabs.findIndex(t => t.id === id);
-    if(tabs[oldIndex]) tabs[oldIndex].content = window.editorInstance.getValue();
+    
+    // Save Old State
+    if(tabs[oldIndex]) {
+        tabs[oldIndex].content = window.editorInstance.getValue();
+        tabs[oldIndex].viewState = window.editorInstance.saveViewState();
+        // fontSize is already up to date in tabs array
+    }
     
     const container = document.getElementById('container');
     const direction = newIndex > oldIndex ? 'next' : 'prev';
@@ -585,7 +600,18 @@ window.switchTab = (id) => {
     
     setTimeout(() => {
         activeTabId = id; 
-        window.editorInstance.setValue(tabs[newIndex].content);
+        const newTab = tabs[newIndex];
+        
+        window.editorInstance.setValue(newTab.content);
+        // Apply Tab's Font Size
+        window.editorInstance.updateOptions({ fontSize: newTab.fontSize || 16 });
+        
+        if (newTab.viewState) {
+            window.editorInstance.restoreViewState(newTab.viewState);
+        } else {
+            window.editorInstance.setScrollTop(0);
+        }
+
         container.className = direction === 'next' ? 'anim-next-in' : 'anim-prev-in';
         saveState(); window.renderTabs();
         setTimeout(() => { container.className = ''; }, 200);
@@ -594,9 +620,13 @@ window.switchTab = (id) => {
 
 document.getElementById('add-tab-btn').onclick = () => {
     const cur = tabs.find(t => t.id === activeTabId);
-    if(cur) cur.content = window.editorInstance.getValue();
+    if(cur) {
+        cur.content = window.editorInstance.getValue();
+        cur.viewState = window.editorInstance.saveViewState();
+    }
     const newId = Date.now();
-    tabs.push({ id: newId, name: `Script ${tabs.length + 1}`, content: DEFAULT_CODE });
+    // New tab gets default fontSize 16
+    tabs.push({ id: newId, name: `Script ${tabs.length + 1}`, content: DEFAULT_CODE, viewState: null, fontSize: 16 });
     window.switchTab(newId);
 };
 
@@ -605,7 +635,7 @@ window.editorInstance.onDidChangeModelContent(() => {
     if (current) { current.content = window.editorInstance.getValue(); saveState(); }
 });
 
-/* Context Menu Logic */
+/* Context Menu & Actions */
 const menu = document.getElementById('tab-menu');
 window.showTabMenu = (id, x, y) => {
     targetTabId = id;
@@ -632,12 +662,12 @@ document.getElementById('rename-apply').onclick = (e) => {
 };
 document.getElementById('menu-delete').onclick = () => {
     menu.style.display = 'none'; tabs = tabs.filter(t => t.id !== targetTabId);
-    if (tabs.length === 0) tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE }];
+    if (tabs.length === 0) tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }];
     if (activeTabId === targetTabId) { activeTabId = tabs[0].id; window.editorInstance.setValue(tabs[0].content); }
     saveState(); window.renderTabs();
 };
 
-/* Ultimate Completion Provider (Master Refined with Context Awareness) */
+/* Completion Provider (SMART CONTEXT SCANNER) */
 monaco.languages.registerCompletionItemProvider('lua', {
   triggerCharacters: ['.', ':', '"', "'"],
   provideCompletionItems(model, pos) {
@@ -648,60 +678,74 @@ monaco.languages.registerCompletionItemProvider('lua', {
     const m = before.match(/([\w\.:"'\(\)]+)([\.:])$/);
     if (m) {
       const type = m[1]; const colon = m[2] === ':';
-      
-      // Check API (Services & Instances)
       if (API[type]) {
         const out = []; 
-        if (!colon) {
-            API[type].props.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
-        }
+        if (!colon) API[type].props.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
         API[type].methods.concat(COMMON).forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
         return { suggestions: out };
       }
-      
-      // Check Data Types
       if (DATA_TYPES[type]) {
         const d = DATA_TYPES[type]; const out = [];
-        if (!colon) {
-            d.props?.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range }));
-            d.static?.forEach(s => out.push({ label: s, kind: monaco.languages.CompletionItemKind.Method, insertText: s + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
-        }
+        if (!colon) { d.props?.forEach(p => out.push({ label: p, kind: monaco.languages.CompletionItemKind.Property, insertText: p, range })); d.static?.forEach(s => out.push({ label: s, kind: monaco.languages.CompletionItemKind.Method, insertText: s + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range })); }
         d.methods?.forEach(fn => out.push({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
         return { suggestions: out };
       }
-      
-      // Check Lua Libs
       if (LUA_LIBS[type] && !colon) return { suggestions: LUA_LIBS[type].methods.map(fn => ({ label: fn, kind: monaco.languages.CompletionItemKind.Method, insertText: fn + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range })) };
     }
-    
-    // Global Scope Suggestions
     const suggestions = [];
-    
-    // 1. Standard Keywords & Functions
     LUA_KEYWORDS.forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Keyword, insertText: k, range }));
     GLOBAL_FUNCS.forEach(f => suggestions.push({ label: f, kind: monaco.languages.CompletionItemKind.Function, insertText: f + '($0)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
     SNIPPETS.forEach(s => suggestions.push({ label: s.label, kind: monaco.languages.CompletionItemKind.Snippet, insertText: s.insertText, insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, range }));
     Object.keys(API).forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Class, insertText: k, range }));
     Object.keys(DATA_TYPES).forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Struct, insertText: k, range }));
-
-    // 2. Context Aware Scanning (Scan document for user variables/words)
-    const text = model.getValue();
-    // Scan for all words [a-zA-Z_] that are NOT in our known lists
-    const scannedWords = text.match(/[a-zA-Z_]\w*/g) || [];
-    const uniqueScanned = [...new Set(scannedWords)];
+    Object.keys(LUA_LIBS).forEach(k => suggestions.push({ label: k, kind: monaco.languages.CompletionItemKind.Module, insertText: k, range }));
     
-    uniqueScanned.forEach(w => {
-        // If word is NOT in our excluded known list (DataTypes/Keywords), add it as "Text"
-        if (!KNOWN_WORDS.has(w) && isNaN(w) && w !== word.word) {
-            suggestions.push({
-                label: w,
-                kind: monaco.languages.CompletionItemKind.Text, // Show as Text icon
-                insertText: w,
-                detail: 'User Word',
-                range: range
-            });
+    // --- SMART CONTEXT SCANNER ---
+    const text = model.getValue();
+    if (text.length < 50000) { // Limit scanning for performance
+        const foundWords = new Set(KNOWN_WORDS);
+        let match;
+
+        // 1. Scan Locals (local x)
+        const localRegex = /\blocal\s+([a-zA-Z_]\w*)/g;
+        while ((match = localRegex.exec(text)) !== null) {
+            const w = match[1];
+            if (!foundWords.has(w)) {
+                suggestions.push({ label: w, kind: monaco.languages.CompletionItemKind.Variable, detail: '(Local Variable)', insertText: w, range });
+                foundWords.add(w);
+            }
         }
-    });
+
+        // 2. Scan User Functions (function x)
+        const funcRegex = /\bfunction\s+([a-zA-Z_]\w*)/g;
+        while ((match = funcRegex.exec(text)) !== null) {
+            const w = match[1];
+            if (!foundWords.has(w)) {
+                suggestions.push({ label: w, kind: monaco.languages.CompletionItemKind.Function, detail: '(User Function)', insertText: w, range });
+                foundWords.add(w);
+            }
+        }
+
+        // 3. Scan Globals/Assignments (x = ...)
+        const globalRegex = /(?:^|[\r\n\s])([a-zA-Z_]\w*)\s*=[^=]/g;
+        while ((match = globalRegex.exec(text)) !== null) {
+            const w = match[1];
+            if (!foundWords.has(w)) {
+                suggestions.push({ label: w, kind: monaco.languages.CompletionItemKind.Variable, detail: '(Global Variable)', insertText: w, range });
+                foundWords.add(w);
+            }
+        }
+
+        // 4. Scan Remaining Text (Words appearing in text)
+        const textRegex = /[a-zA-Z_]\w*/g;
+        while ((match = textRegex.exec(text)) !== null) {
+            const w = match[0];
+            if (!foundWords.has(w) && isNaN(w)) {
+                suggestions.push({ label: w, kind: monaco.languages.CompletionItemKind.Text, detail: '(Text)', insertText: w, range });
+                foundWords.add(w);
+            }
+        }
+    }
 
     return { suggestions };
   }
@@ -719,7 +763,6 @@ window.editorInstance.addAction({ id: 'load-script', label: 'Load Script from De
     }; f.click();
 }});
 window.editorInstance.addAction({ id: 'format', label: 'Format Document', contextMenuGroupId: 'navigation', run: () => window.editorInstance.getAction('editor.action.formatDocument').run() });
-
 window.addEventListener('resize', window.updateIndicator);
 });
 
