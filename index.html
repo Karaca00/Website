@@ -30,6 +30,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 /* Animations */
 @keyframes slideDownHeader { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes slideUpToast { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
 
 /* Neon Pulse */
 @keyframes neonPulse {
@@ -52,7 +53,8 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 .brandes { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 6px; margin-left: 2px; animation: neonPulse 2s infinite ease-in-out reverse; }
 .controls { display: flex; align-items: center; gap: 8px; }
 
-.header-btn { background: #000; color: var(--text-main); border: 1px solid var(--border); padding: 0 12px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
+/* UPDATED: Removed text-transform: uppercase from header-btn */
+.header-btn { background: #000; color: var(--text-main); border: 1px solid var(--border); padding: 0 12px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; transition: all 0.2s; white-space: nowrap; }
 .header-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
 #auth-btn { background: #1a1a1a; border-color: #333; }
 
@@ -79,12 +81,25 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 /* Version Indicator */
 #version-tag { position: fixed; bottom: 5px; right: 10px; color: #333; font-size: 10px; font-weight: bold; pointer-events: none; z-index: 9999; opacity: 0.5; }
 
-/* Modal */
+/* Modal System */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 99999; backdrop-filter: blur(5px); }
-.modal-box { background: #0a0a0a; width: 300px; padding: 30px; border-radius: 16px; border: 1px solid #333; box-shadow: 0 0 40px rgba(255,0,0,0.1); }
+.modal-box { background: #0a0a0a; width: 300px; padding: 30px; border-radius: 16px; border: 1px solid #333; box-shadow: 0 0 40px rgba(255,0,0,0.1); display: flex; flex-direction: column; }
 .modal-box h3 { margin: 0 0 25px; font-size: 18px; text-align: center; color: #fff; font-weight: 900; letter-spacing: 1px; }
 .modal-box input { width: 100%; box-sizing: border-box; padding: 14px; margin-bottom: 15px; background: #151515; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; transition: 0.3s; }
 .modal-box input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(255,0,0,0.2); }
+.modal-box input:read-only { opacity: 0.5; cursor: not-allowed; border-color: #222; }
+
+/* Modal Labels */
+.input-label { color: #888; font-size: 11px; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
+
+/* Error & Buttons */
+#auth-error { color: #ff3b30; font-size: 12px; margin-bottom: 15px; text-align: center; font-weight: bold; display: none; animation: shake 0.4s ease-in-out; }
+.btn-primary { width:100%; padding:14px; border:none; border-radius:8px; background:var(--accent); color:#fff; font-weight:800; text-transform:uppercase; cursor:pointer; transition:0.3s; margin-bottom: 5px; }
+.btn-primary:hover { box-shadow: 0 0 20px rgba(255,0,0,0.4); }
+.btn-secondary { width:100%; padding:10px; border:none; border-radius:8px; background:transparent; color:#777; cursor:pointer; font-size:11px; margin-top:5px; }
+.btn-secondary:hover { color: #fff; }
+.btn-danger { width:100%; padding:14px; border:1px solid #ff3b30; border-radius:8px; background:rgba(255, 59, 48, 0.1); color:#ff3b30; font-weight:800; text-transform:uppercase; cursor:pointer; transition:0.3s; margin-top: 10px; }
+.btn-danger:hover { background: #ff3b30; color: #fff; }
 
 #tab-menu { position: fixed; background: #111; border: 1px solid #333; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); padding: 6px; min-width: 180px; z-index: 10001; display: none; }
 .menu-item { padding: 10px 14px; color: #eee; font-size: 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; }
@@ -117,17 +132,41 @@ input, textarea { font-size: 16px !important; }
 </div>
 <div id="tab-bar"><div id="tabs-container"></div><div id="tab-indicator"></div><button id="add-tab-btn">+</button></div>
 <div id="container-viewport"><div id="container"></div></div>
-<div id="version-tag">v3.2</div>
+<div id="version-tag">v3.5</div>
 
-<!-- Auth Modal -->
+<!-- Auth Modal (Login/Register) -->
 <div id="auth-modal" class="modal-overlay" onclick="if(event.target==this) window.closeAuthModal()">
     <div class="modal-box">
         <h3 id="auth-title">SYNC WITH CLOUD</h3>
-        <input type="text" id="auth-user" placeholder="Username (Min 3 chars)">
-        <input type="password" id="auth-pass" placeholder="Password (Min 6 chars)">
-        <button class="btn-primary" style="width:100%; padding:14px; border:none; border-radius:8px; background:var(--accent); color:#fff; font-weight:800; text-transform:uppercase; cursor:pointer; transition:0.3s;" onmouseover="this.style.boxShadow='0 0 20px rgba(255,0,0,0.4)'" onmouseout="this.style.boxShadow='none'" onclick="window.handleAuth()">Confirm</button>
-        <button class="btn-secondary" style="width:100%; padding:10px; border:none; border-radius:8px; background:transparent; color:#777; cursor:pointer; font-size:11px; margin-top:5px;" id="auth-switch" onclick="window.switchAuthMode()">No account? Create one</button>
-        <button class="btn-secondary" style="width:100%; padding:10px; border:none; border-radius:8px; background:transparent; color:#777; cursor:pointer; font-size:11px;" onclick="window.closeAuthModal()">Cancel</button>
+        
+        <div class="input-label">USERNAME</div>
+        <input type="text" id="auth-user" placeholder="English Only, Min 3 Chars">
+        
+        <div class="input-label">PASSWORD</div>
+        <input type="password" id="auth-pass" placeholder="Eng/Num/Sym Only, Min 6 Chars">
+        
+        <div id="auth-error"></div>
+
+        <button class="btn-primary" onclick="window.handleAuth()">Confirm</button>
+        <button class="btn-secondary" id="auth-switch" onclick="window.switchAuthMode()">No account? Create one</button>
+        <button class="btn-secondary" onclick="window.closeAuthModal()">Cancel</button>
+    </div>
+</div>
+
+<!-- Profile Modal (Settings) -->
+<div id="profile-modal" class="modal-overlay" onclick="if(event.target==this) window.closeProfileModal()">
+    <div class="modal-box">
+        <h3>ACCOUNT SETTINGS</h3>
+        
+        <div class="input-label">LOGIN USERNAME (CANNOT CHANGE)</div>
+        <input type="text" id="profile-username" readonly title="You cannot change your login username">
+        
+        <div class="input-label">DISPLAY NAME (EDITABLE)</div>
+        <input type="text" id="profile-displayname" placeholder="Enter your display name">
+        
+        <button class="btn-primary" onclick="window.saveProfile()">Save Changes</button>
+        <button class="btn-danger" onclick="window.performLogout()">LOGOUT</button>
+        <button class="btn-secondary" onclick="window.closeProfileModal()">Close</button>
     </div>
 </div>
 
@@ -170,12 +209,22 @@ let saveDebounceTimer = null;
 /* UI State Keys */
 const TABS_KEY = 'roblox_tabs_master_v32';
 const ACTIVE_ID_KEY = 'active_tab_id_v32';
+const USER_CACHE_KEY = 'zenu_user_cache_v2'; 
 const DEFAULT_CODE = 'print("Hello World")';
 
-/* Initial Load - Always from LocalStorage (Guest Mode) */
+/* Initial Load */
 let tabs = JSON.parse(localStorage.getItem(TABS_KEY)) || [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, viewState: null, fontSize: 16 }];
 let activeTabId = parseInt(localStorage.getItem(ACTIVE_ID_KEY)) || tabs[0].id;
 tabs = tabs.map(t => ({...t, fontSize: t.fontSize || 16}));
+
+const cachedUser = JSON.parse(localStorage.getItem(USER_CACHE_KEY));
+if (cachedUser) {
+    currentUser = cachedUser;
+    const display = currentUser.displayName || currentUser.username;
+    // UPDATED: No more .toUpperCase()
+    document.getElementById('auth-btn').innerHTML = `<span>👤</span> ${display}`;
+}
+
 let targetTabId = null;
 
 /* --- UI Handlers --- */
@@ -204,7 +253,7 @@ window.renderTabs = () => {
     setTimeout(window.updateIndicator, 100);
 };
 
-/* --- SYSTEM SAVE LOGIC (Exclusive Paths) --- */
+/* --- SYSTEM SAVE LOGIC --- */
 async function saveCore(isClosing = false) {
     const currentTab = tabs.find(t => t.id === activeTabId);
     if (currentTab && window.editorInstance) {
@@ -214,7 +263,12 @@ async function saveCore(isClosing = false) {
 
     if (currentUser) {
         const userRef = db.doc(`artifacts/${appId}/users/${currentUser.uid}/data/state`);
-        const payload = { tabs, activeTabId, lastSync: Date.now() };
+        const payload = { 
+            tabs, 
+            activeTabId, 
+            displayName: currentUser.displayName, 
+            lastSync: Date.now() 
+        };
         try {
             const cleanPayload = JSON.parse(JSON.stringify(payload));
             await userRef.set(cleanPayload, { merge: true });
@@ -237,12 +291,12 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') saveCore(true);
 });
 
-/* --- INTELLIGENT AUTO-UPDATE SYSTEM (v3.2 Logic) --- */
+/* --- AUTO UPDATE --- */
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').then(reg => {
             reg.update();
-            setInterval(() => reg.update(), 5 * 60 * 1000); // Check every 5 mins
+            setInterval(() => reg.update(), 5 * 60 * 1000);
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') reg.update();
             });
@@ -253,41 +307,70 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('controllerchange', async () => {
         if (!refreshing) {
             refreshing = true;
-            console.log("New version detected! Saving and reloading...");
-            
             const toast = document.createElement('div');
             toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:linear-gradient(45deg, #00ce09, #00ff88); color:black; padding:15px 30px; border-radius:50px; z-index:100000; font-weight:900; box-shadow:0 10px 30px rgba(0,255,0,0.3); font-size:14px; animation: slideUpToast 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display:flex; align-items:center; gap:10px;";
             toast.innerHTML = "<span>🚀</span> UPDATING ZENU HUB...";
             document.body.appendChild(toast);
-
             await saveCore(true);
             setTimeout(() => window.location.reload(), 2000);
         }
     });
 }
 
-/* --- Auth & Data Loading Logic --- */
+/* --- AUTH & PROFILE LOGIC --- */
+
 window.handleAccountAction = () => {
     if (currentUser) {
-        if (confirm(`User: ${currentUser.username}\nLogout and Switch to Local Storage?`)) {
-            saveCore(true);
-            auth.signOut().then(() => {
-                const localTabs = JSON.parse(localStorage.getItem(TABS_KEY));
-                const localId = parseInt(localStorage.getItem(ACTIVE_ID_KEY));
-                if (localTabs) {
-                    tabs = localTabs.map(t => ({...t, fontSize: t.fontSize || 16}));
-                    activeTabId = localId || tabs[0].id;
-                } else {
-                    tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }];
-                    activeTabId = tabs[0].id;
-                }
-                window.refreshEditorState();
-                window.renderTabs();
-            });
-        }
+        window.openProfileModal();
         return;
     }
+    document.getElementById('auth-error').style.display = 'none';
     document.getElementById('auth-modal').style.display = 'flex';
+};
+
+window.openProfileModal = () => {
+    document.getElementById('profile-username').value = currentUser.username || "Unknown";
+    document.getElementById('profile-displayname').value = currentUser.displayName || currentUser.username;
+    document.getElementById('profile-modal').style.display = 'flex';
+};
+
+window.closeProfileModal = () => {
+    document.getElementById('profile-modal').style.display = 'none';
+};
+
+window.saveProfile = () => {
+    const newDisplay = document.getElementById('profile-displayname').value.trim();
+    if (!newDisplay) return alert("Display name cannot be empty");
+
+    currentUser.displayName = newDisplay;
+    localStorage.setItem(USER_CACHE_KEY, JSON.stringify(currentUser));
+    
+    // UPDATED: No more .toUpperCase()
+    document.getElementById('auth-btn').innerHTML = `<span>👤</span> ${newDisplay}`;
+    
+    saveCore();
+    window.closeProfileModal();
+};
+
+window.performLogout = () => {
+    if (confirm(`Confirm Logout: ${currentUser.username}?`)) {
+        saveCore(true);
+        auth.signOut().then(() => {
+            localStorage.removeItem(USER_CACHE_KEY);
+            const localTabs = JSON.parse(localStorage.getItem(TABS_KEY));
+            const localId = parseInt(localStorage.getItem(ACTIVE_ID_KEY));
+            if (localTabs) {
+                tabs = localTabs.map(t => ({...t, fontSize: t.fontSize || 16}));
+                activeTabId = localId || tabs[0].id;
+            } else {
+                tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }];
+                activeTabId = tabs[0].id;
+            }
+            window.closeProfileModal();
+            window.refreshEditorState();
+            window.renderTabs();
+        });
+    }
 };
 
 window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
@@ -295,50 +378,94 @@ window.switchAuthMode = () => {
     isRegisterMode = !isRegisterMode;
     document.getElementById('auth-title').innerText = isRegisterMode ? "CREATE CLOUD ACCOUNT" : "SYNC WITH CLOUD";
     document.getElementById('auth-switch').innerText = isRegisterMode ? "Back to Login" : "No account? Create one";
+    document.getElementById('auth-error').style.display = 'none';
 };
+
+function showAuthError(msg) {
+    const errEl = document.getElementById('auth-error');
+    errEl.innerText = msg;
+    errEl.style.display = 'block';
+    errEl.style.animation = 'none';
+    errEl.offsetHeight; 
+    errEl.style.animation = 'shake 0.4s ease-in-out';
+}
 
 window.handleAuth = async () => {
     const userPart = document.getElementById('auth-user').value.trim();
     const pass = document.getElementById('auth-pass').value;
-    if (userPart.length < 3 || pass.length < 6) return alert("Username must be 3+ chars, Password 6+");
+    
+    const usernameRegex = /^[a-zA-Z]+$/;
+    if (userPart.length < 3) return showAuthError("Username must be at least 3 characters.");
+    if (!usernameRegex.test(userPart)) return showAuthError("Username must be English letters ONLY.");
+
+    const passwordRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
+    if (pass.length < 6) return showAuthError("Password must be at least 6 characters.");
+    if (!passwordRegex.test(pass)) return showAuthError("Password contains invalid characters (Eng/Num/Sym only).");
+
     const email = `${userPart.toLowerCase()}@master.ide`;
     const usernameId = userPart.toLowerCase();
 
     try {
         if (isRegisterMode) {
             const usernameDoc = await db.doc(`artifacts/${appId}/usernames/${usernameId}`).get();
-            if (usernameDoc.exists) return alert("Username taken.");
+            if (usernameDoc.exists) return showAuthError("This Username is already taken.");
+            
             const res = await auth.createUserWithEmailAndPassword(email, pass);
             const batch = db.batch();
             const cleanTabs = JSON.parse(JSON.stringify(tabs));
-            batch.set(db.doc(`artifacts/${appId}/users/${res.user.uid}/data/state`), { tabs: cleanTabs, activeTabId, lastSync: Date.now(), username: userPart });
+            
+            batch.set(db.doc(`artifacts/${appId}/users/${res.user.uid}/data/state`), { 
+                tabs: cleanTabs, 
+                activeTabId, 
+                lastSync: Date.now(), 
+                username: userPart,
+                displayName: userPart
+            });
             batch.set(db.doc(`artifacts/${appId}/usernames/${usernameId}`), { uid: res.user.uid });
             await batch.commit();
         } else {
             await auth.signInWithEmailAndPassword(email, pass);
         }
         window.closeAuthModal();
-    } catch (e) { alert(e.message); }
+    } catch (e) { 
+        let msg = e.message;
+        if(e.code === 'auth/wrong-password') msg = "Incorrect Password.";
+        if(e.code === 'auth/user-not-found') msg = "Username not found.";
+        if(e.code === 'auth/email-already-in-use') msg = "Username already exists.";
+        showAuthError(msg); 
+    }
 };
 
 auth.onAuthStateChanged(async (user) => {
     const btn = document.getElementById('auth-btn');
     if (user) {
-        currentUser = { uid: user.uid, username: user.email.split('@')[0] };
-        btn.innerHTML = `<span>👤</span> ${currentUser.username.toUpperCase()}`;
+        const username = user.email.split('@')[0];
         try {
             const doc = await db.doc(`artifacts/${appId}/users/${user.uid}/data/state`).get();
             if (doc.exists) {
                 const data = doc.data();
+                const displayName = data.displayName || username; 
+                currentUser = { uid: user.uid, username: username, displayName: displayName };
+                localStorage.setItem(USER_CACHE_KEY, JSON.stringify(currentUser));
+                // UPDATED: No more .toUpperCase()
+                btn.innerHTML = `<span>👤</span> ${displayName}`;
+
                 if (data.tabs) tabs = data.tabs.map(t => ({...t, fontSize: t.fontSize || 16}));
                 activeTabId = data.activeTabId || activeTabId;
                 window.refreshEditorState();
                 window.renderTabs();
+            } else {
+                currentUser = { uid: user.uid, username: username, displayName: username };
+                // UPDATED: No more .toUpperCase()
+                btn.innerHTML = `<span>👤</span> ${username}`;
             }
         } catch(e) { console.error("Fetch Error", e); }
     } else { 
-        currentUser = null; 
-        btn.innerHTML = `<span>👤</span> LOGIN`; 
+        if (currentUser) {
+            currentUser = null;
+            localStorage.removeItem(USER_CACHE_KEY);
+            btn.innerHTML = `<span>👤</span> LOGIN`; 
+        }
     }
 });
 
@@ -626,7 +753,7 @@ document.getElementById('add-tab-btn').onclick = () => {
     }
     const newId = Date.now();
     // New tab gets default fontSize 16
-    tabs.push({ id: newId, name: `Script ${tabs.length + 1}`, content: DEFAULT_CODE, viewState: null, fontSize: 16 });
+    tabs.push({ id: newId, name: `Script ${tabs.length + 1}`, content: DEFAULT_CODE, fontSize: 16 });
     window.switchTab(newId);
 };
 
