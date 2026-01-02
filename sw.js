@@ -3,7 +3,7 @@
    -----------------------------------------------------------
    Added: Icon Sizing Fix
    =========================================================== */
-const CURRENT_VERSION = 'ZENU-MASTER-v4.5'; 
+const CURRENT_VERSION = 'ZENU-MASTER-v4.5.2.7.6'; 
 
 const ASSETS_TO_CACHE = [
   './',
