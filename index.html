@@ -27,35 +27,79 @@
 
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); overflow: hidden; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; -webkit-text-size-adjust: 100%; touch-action: none; }
 
+/* --- LOADING SCREEN (TRANSPARENT GLASS) --- */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.15);
+}
+
+.loading-text {
+    margin-top: 25px;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* --- MAIN UI VISIBILITY --- */
+#header, #tab-bar, #container-viewport {
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+}
+
+.ui-loaded {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
 /* Animations */
 @keyframes slideDownHeader { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes slideUpToast { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
 
-/* Neon Pulse */
 @keyframes neonPulse {
   0%, 100% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.6), 0 0 10px rgba(255, 0, 0, 0.3); opacity: 0.95; }
   50% { text-shadow: 0 0 10px #ff0000, 0 0 20px rgba(255, 0, 0, 0.5); opacity: 1; filter: brightness(1.1); }
 }
 
-/* Directional Animations */
-.anim-next-out { animation: slideOutToLeft 0.2s forwards; } .anim-next-in { animation: slideInFromRight 0.2s forwards; }
-.anim-prev-out { animation: slideOutToRight 0.2s forwards; } .anim-prev-in { animation: slideInFromLeft 0.2s forwards; }
-@keyframes slideOutToLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30px); opacity: 0; } }
-@keyframes slideInFromRight { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes slideOutToRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(30px); opacity: 0; } }
-@keyframes slideInFromLeft { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
 /* Layout */
-#header { height: 60px; background: var(--bg-header); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #1a1a1a; animation: slideDownHeader 0.7s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
+#header { height: 60px; background: var(--bg-header); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #1a1a1a; z-index: 1000; }
 .brand-container { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; line-height: 1; }
-.brand { color: var(--text-main); font-size: 20px; font-weight: 900; letter-spacing: 1px; font-style: italic; animation: neonPulse 2s infinite ease-in-out; }
-.brandes { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 6px; margin-left: 2px; animation: neonPulse 2s infinite ease-in-out reverse; }
+.brand { color: var(--text-main); font-size: 20px; font-weight: 900; letter-spacing: 1px; font-style: italic; animation: neonPulse 2s infinite ease-in-out; will-change: opacity, text-shadow; }
+.brandes { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 6px; margin-left: 2px; animation: neonPulse 2s infinite ease-in-out reverse; will-change: opacity, text-shadow; }
 .controls { display: flex; align-items: center; gap: 8px; }
 
-/* UPDATED: Removed text-transform: uppercase from header-btn */
 .header-btn { background: #000; color: var(--text-main); border: 1px solid var(--border); padding: 0 12px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; transition: all 0.2s; white-space: nowrap; }
 .header-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
+/* Header Icon Sizing */
+.header-btn span { font-size: 1.3em; line-height: 1; display: flex; align-items: center; }
+
 #auth-btn { background: #1a1a1a; border-color: #333; }
 
 .zoom-group { display: flex; gap: 4px; background: #000; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
@@ -78,7 +122,6 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 #container-viewport { width: 100%; height: calc(100% - 102px); background: var(--bg-dark); overflow: hidden; position: relative; }
 #container { width: 100%; height: 100%; }
 
-/* Version Indicator */
 #version-tag { position: fixed; bottom: 5px; right: 10px; color: #333; font-size: 10px; font-weight: bold; pointer-events: none; z-index: 9999; opacity: 0.5; }
 
 /* Modal System */
@@ -89,10 +132,8 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 .modal-box input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(255,0,0,0.2); }
 .modal-box input:read-only { opacity: 0.5; cursor: not-allowed; border-color: #222; }
 
-/* Modal Labels */
 .input-label { color: #888; font-size: 11px; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
 
-/* Error & Buttons */
 #auth-error { color: #ff3b30; font-size: 12px; margin-bottom: 15px; text-align: center; font-weight: bold; display: none; animation: shake 0.4s ease-in-out; }
 .btn-primary { width:100%; padding:14px; border:none; border-radius:8px; background:var(--accent); color:#fff; font-weight:800; text-transform:uppercase; cursor:pointer; transition:0.3s; margin-bottom: 5px; }
 .btn-primary:hover { box-shadow: 0 0 20px rgba(255,0,0,0.4); }
@@ -109,12 +150,28 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(-
 .monaco-editor .scroll-decoration { display: none; }
 .monaco-editor .slider { background: #333 !important; border-radius: 4px !important; }
 .monaco-editor .slider:hover { background: #555 !important; }
+
+/* FIX: Auto Complete Icon Scaling (Relative to Text) */
+.monaco-editor .suggest-widget .monaco-list .monaco-list-row .codicon {
+    font-size: 1.2em !important; /* Scale relative to text */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transform: scale(1.1); /* Slight boost for better visibility */
+}
+
 input, textarea { font-size: 16px !important; }
 @viewport { width: device-width; zoom: 1.0; }
 </style>
 </head>
 
 <body>
+<!-- TRANSPARENT LOADING SCREEN -->
+<div id="loading-screen">
+    <div class="spinner"></div>
+    <div class="loading-text">INITIALIZING</div>
+</div>
+
 <div id="header">
     <div class="brand-container">
         <div class="brand">ZENU</div>
@@ -132,38 +189,31 @@ input, textarea { font-size: 16px !important; }
 </div>
 <div id="tab-bar"><div id="tabs-container"></div><div id="tab-indicator"></div><button id="add-tab-btn">+</button></div>
 <div id="container-viewport"><div id="container"></div></div>
-<div id="version-tag">v3.5</div>
+<div id="version-tag">v4.5.1</div>
 
-<!-- Auth Modal (Login/Register) -->
+<!-- Auth Modal -->
 <div id="auth-modal" class="modal-overlay" onclick="if(event.target==this) window.closeAuthModal()">
     <div class="modal-box">
         <h3 id="auth-title">SYNC WITH CLOUD</h3>
-        
         <div class="input-label">USERNAME</div>
         <input type="text" id="auth-user" placeholder="English Only, Min 3 Chars">
-        
         <div class="input-label">PASSWORD</div>
         <input type="password" id="auth-pass" placeholder="Eng/Num/Sym Only, Min 6 Chars">
-        
         <div id="auth-error"></div>
-
         <button class="btn-primary" onclick="window.handleAuth()">Confirm</button>
         <button class="btn-secondary" id="auth-switch" onclick="window.switchAuthMode()">No account? Create one</button>
         <button class="btn-secondary" onclick="window.closeAuthModal()">Cancel</button>
     </div>
 </div>
 
-<!-- Profile Modal (Settings) -->
+<!-- Profile Modal -->
 <div id="profile-modal" class="modal-overlay" onclick="if(event.target==this) window.closeProfileModal()">
     <div class="modal-box">
         <h3>ACCOUNT SETTINGS</h3>
-        
         <div class="input-label">LOGIN USERNAME (CANNOT CHANGE)</div>
         <input type="text" id="profile-username" readonly title="You cannot change your login username">
-        
         <div class="input-label">DISPLAY NAME (EDITABLE)</div>
         <input type="text" id="profile-displayname" placeholder="Enter your display name">
-        
         <button class="btn-primary" onclick="window.saveProfile()">Save Changes</button>
         <button class="btn-danger" onclick="window.performLogout()">LOGOUT</button>
         <button class="btn-secondary" onclick="window.closeProfileModal()">Close</button>
@@ -212,22 +262,34 @@ const ACTIVE_ID_KEY = 'active_tab_id_v32';
 const USER_CACHE_KEY = 'zenu_user_cache_v2'; 
 const DEFAULT_CODE = 'print("Hello World")';
 
-/* Initial Load */
-let tabs = JSON.parse(localStorage.getItem(TABS_KEY)) || [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, viewState: null, fontSize: 16 }];
-let activeTabId = parseInt(localStorage.getItem(ACTIVE_ID_KEY)) || tabs[0].id;
-tabs = tabs.map(t => ({...t, fontSize: t.fontSize || 16}));
+/* --- SMART LOADING STATE --- */
+let tabs = [];
+let activeTabId = null;
+let isDataLoaded = false;
+let targetTabId = null;
 
+// Optimistic User Name Display
 const cachedUser = JSON.parse(localStorage.getItem(USER_CACHE_KEY));
 if (cachedUser) {
-    currentUser = cachedUser;
-    const display = currentUser.displayName || currentUser.username;
-    // UPDATED: No more .toUpperCase()
+    const display = cachedUser.displayName || cachedUser.username;
     document.getElementById('auth-btn').innerHTML = `<span>👤</span> ${display}`;
 }
 
-let targetTabId = null;
-
 /* --- UI Handlers --- */
+window.revealUI = () => {
+    const loader = document.getElementById('loading-screen');
+    const header = document.getElementById('header');
+    const tabBar = document.getElementById('tab-bar');
+    const viewport = document.getElementById('container-viewport');
+
+    loader.style.opacity = '0';
+    setTimeout(() => { loader.style.display = 'none'; }, 600);
+
+    header.classList.add('ui-loaded');
+    tabBar.classList.add('ui-loaded');
+    viewport.classList.add('ui-loaded');
+};
+
 window.updateIndicator = () => {
     const el = document.querySelector('.tab.active');
     const ind = document.getElementById('tab-indicator');
@@ -241,6 +303,8 @@ window.updateIndicator = () => {
 window.renderTabs = () => {
     const container = document.getElementById('tabs-container');
     container.innerHTML = '';
+    if (!tabs || tabs.length === 0) return; 
+    
     tabs.forEach(tab => {
         const div = document.createElement('div');
         div.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
@@ -255,6 +319,8 @@ window.renderTabs = () => {
 
 /* --- SYSTEM SAVE LOGIC --- */
 async function saveCore(isClosing = false) {
+    if (!isDataLoaded) return; 
+
     const currentTab = tabs.find(t => t.id === activeTabId);
     if (currentTab && window.editorInstance) {
         currentTab.content = window.editorInstance.getValue();
@@ -291,14 +357,22 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') saveCore(true);
 });
 
-/* --- AUTO UPDATE --- */
+/* --- AUTO UPDATE (SPEED: 30s + FOCUS TRIGGER) --- */
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').then(reg => {
             reg.update();
-            setInterval(() => reg.update(), 5 * 60 * 1000);
+            setInterval(() => reg.update(), 30 * 1000); // Check every 30 seconds
+            
+            // Trigger update on tab visibility change
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') reg.update();
+            });
+
+            // Trigger update on window focus
+            window.addEventListener('focus', () => {
+                console.log("Window focused - Checking for updates...");
+                reg.update();
             });
         });
     });
@@ -318,7 +392,6 @@ if ('serviceWorker' in navigator) {
 }
 
 /* --- AUTH & PROFILE LOGIC --- */
-
 window.handleAccountAction = () => {
     if (currentUser) {
         window.openProfileModal();
@@ -344,8 +417,6 @@ window.saveProfile = () => {
 
     currentUser.displayName = newDisplay;
     localStorage.setItem(USER_CACHE_KEY, JSON.stringify(currentUser));
-    
-    // UPDATED: No more .toUpperCase()
     document.getElementById('auth-btn').innerHTML = `<span>👤</span> ${newDisplay}`;
     
     saveCore();
@@ -357,18 +428,7 @@ window.performLogout = () => {
         saveCore(true);
         auth.signOut().then(() => {
             localStorage.removeItem(USER_CACHE_KEY);
-            const localTabs = JSON.parse(localStorage.getItem(TABS_KEY));
-            const localId = parseInt(localStorage.getItem(ACTIVE_ID_KEY));
-            if (localTabs) {
-                tabs = localTabs.map(t => ({...t, fontSize: t.fontSize || 16}));
-                activeTabId = localId || tabs[0].id;
-            } else {
-                tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }];
-                activeTabId = tabs[0].id;
-            }
-            window.closeProfileModal();
-            window.refreshEditorState();
-            window.renderTabs();
+            window.location.reload(); 
         });
     }
 };
@@ -412,11 +472,11 @@ window.handleAuth = async () => {
             
             const res = await auth.createUserWithEmailAndPassword(email, pass);
             const batch = db.batch();
-            const cleanTabs = JSON.parse(JSON.stringify(tabs));
+            const cleanTabs = JSON.parse(JSON.stringify([{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }]));
             
             batch.set(db.doc(`artifacts/${appId}/users/${res.user.uid}/data/state`), { 
                 tabs: cleanTabs, 
-                activeTabId, 
+                activeTabId: cleanTabs[0].id, 
                 lastSync: Date.now(), 
                 username: userPart,
                 displayName: userPart
@@ -436,57 +496,96 @@ window.handleAuth = async () => {
     }
 };
 
+// --- AUTH STATE CHANGE (SMART LOAD) ---
 auth.onAuthStateChanged(async (user) => {
     const btn = document.getElementById('auth-btn');
+    
     if (user) {
+        /* --- LOGGED IN PATH --- */
+        console.log("Status: Logged In - Fetching Cloud Data...");
         const username = user.email.split('@')[0];
+        
         try {
-            const doc = await db.doc(`artifacts/${appId}/users/${user.uid}/data/state`).get();
+            const docRef = db.doc(`artifacts/${appId}/users/${user.uid}/data/state`);
+            let doc;
+            
+            try { doc = await docRef.get({ source: 'cache' }); } catch(e) { doc = await docRef.get({ source: 'server' }); }
+            if (!doc.exists) doc = await docRef.get({ source: 'server' });
+
             if (doc.exists) {
                 const data = doc.data();
                 const displayName = data.displayName || username; 
                 currentUser = { uid: user.uid, username: username, displayName: displayName };
                 localStorage.setItem(USER_CACHE_KEY, JSON.stringify(currentUser));
-                // UPDATED: No more .toUpperCase()
                 btn.innerHTML = `<span>👤</span> ${displayName}`;
 
                 if (data.tabs) tabs = data.tabs.map(t => ({...t, fontSize: t.fontSize || 16}));
                 activeTabId = data.activeTabId || activeTabId;
-                window.refreshEditorState();
-                window.renderTabs();
             } else {
                 currentUser = { uid: user.uid, username: username, displayName: username };
-                // UPDATED: No more .toUpperCase()
+                tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }];
+                activeTabId = tabs[0].id;
                 btn.innerHTML = `<span>👤</span> ${username}`;
             }
-        } catch(e) { console.error("Fetch Error", e); }
+        } catch(e) { 
+            console.error("Cloud Error", e); 
+            tabs = [{ id: Date.now(), name: 'ErrorScript', content: "-- Cloud Sync Failed\n" + DEFAULT_CODE, fontSize: 16 }];
+            activeTabId = tabs[0].id;
+        }
     } else { 
-        if (currentUser) {
-            currentUser = null;
-            localStorage.removeItem(USER_CACHE_KEY);
-            btn.innerHTML = `<span>👤</span> LOGIN`; 
+        /* --- GUEST PATH --- */
+        console.log("Status: Guest - Loading Local Data...");
+        currentUser = null;
+        localStorage.removeItem(USER_CACHE_KEY);
+        btn.innerHTML = `<span>👤</span> LOGIN`; 
+        
+        let localTabs = JSON.parse(localStorage.getItem(TABS_KEY));
+        let localId = parseInt(localStorage.getItem(ACTIVE_ID_KEY));
+        
+        if (localTabs && localTabs.length > 0) {
+            tabs = localTabs.map(t => ({...t, fontSize: t.fontSize || 16}));
+            activeTabId = localId || tabs[0].id;
+        } else {
+            tabs = [{ id: Date.now(), name: 'MainScript', content: DEFAULT_CODE, fontSize: 16 }];
+            activeTabId = tabs[0].id;
         }
     }
+    
+    // FINALIZE LOADING
+    isDataLoaded = true;
+    window.refreshEditorState();
+    window.renderTabs();
+    window.revealUI();
 });
 
 window.refreshEditorState = () => {
     if (!window.editorInstance) return;
-    const currentTab = tabs.find(t => t.id === activeTabId);
-    if (currentTab) {
-        window.editorInstance.updateOptions({ fontSize: currentTab.fontSize || 16 });
+    
+    if (!tabs || tabs.length === 0) {
+        window.editorInstance.setValue("");
+        return;
+    }
+
+    let currentTab = tabs.find(t => t.id === activeTabId);
+    if (!currentTab) {
+        activeTabId = tabs[0].id;
+        currentTab = tabs[0];
+    }
+
+    window.editorInstance.updateOptions({ fontSize: currentTab.fontSize || 16 });
+    if (window.editorInstance.getValue() !== currentTab.content) {
         window.editorInstance.setValue(currentTab.content);
-        if (currentTab.viewState) {
-            window.editorInstance.restoreViewState(currentTab.viewState);
-        } else {
-            window.editorInstance.setScrollTop(0);
-        }
-        window.editorInstance.focus();
+    }
+    
+    if (currentTab.viewState) {
+        window.editorInstance.restoreViewState(currentTab.viewState);
+    } else {
+        window.editorInstance.setScrollTop(0);
     }
 };
 
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 window.addEventListener('DOMContentLoaded', () => {
-    window.renderTabs();
     if (isStandalone) document.getElementById('install-app-btn')?.remove();
 });
 </script>
@@ -674,11 +773,20 @@ const LUA_KEYWORDS=['local','function','if','then','elseif','else','for','while'
 const KNOWN_WORDS = new Set([ ...LUA_KEYWORDS, ...GLOBAL_FUNCS, ...Object.keys(API), ...Object.keys(DATA_TYPES), ...Object.keys(LUA_LIBS) ]);
 
 // Initialize with font size from the active tab
-const startTab = tabs.find(t => t.id === activeTabId) || tabs[0];
+// Note: Editor is now initialized with empty or default, content injected later by refreshEditorState
+let startContent = DEFAULT_CODE;
+let startSize = 16;
+// Only init if tabs are loaded (which they aren't yet in this new flow, but safe fallback)
+if(tabs && tabs.length > 0) {
+    const t = tabs.find(t => t.id === activeTabId) || tabs[0];
+    startContent = t.content;
+    startSize = t.fontSize || 16;
+}
+
 window.editorInstance = monaco.editor.create(document.getElementById('container'), {
-    value: startTab.content,
+    value: startContent,
     language: 'lua', theme: 'vs-dark', 
-    fontSize: startTab.fontSize || 16, // Use per-tab font size
+    fontSize: startSize, 
     automaticLayout: true,
     minimap: { enabled: true }, cursorSmoothCaretAnimation: true, smoothScrolling: true,
     wordWrap: "off", scrollbar: { vertical: 'visible', horizontal: 'visible', verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
@@ -688,7 +796,8 @@ window.editorInstance = monaco.editor.create(document.getElementById('container'
 });
 
 // Restore Initial State if available
-if(startTab && startTab.viewState) { window.editorInstance.restoreViewState(startTab.viewState); }
+const initTab = tabs.find(t => t.id === activeTabId);
+if(initTab && initTab.viewState) { window.editorInstance.restoreViewState(initTab.viewState); }
 
 // Zoom Buttons - Update PER TAB
 document.getElementById('zoom-in-btn').onclick = () => { 
@@ -885,11 +994,26 @@ window.editorInstance.addAction({ id: 'load-script', label: 'Load Script from De
         const file = e.target.files[0]; if (!file) return;
         const r = new FileReader(); r.onload = (ev) => { 
             const cur = tabs.find(t => t.id === activeTabId);
-            if (cur) { cur.content = ev.target.result; cur.name = file.name.split('.')[0]; window.editorInstance.setValue(cur.content); window.renderTabs(); saveState(); }
+            if (cur) { 
+                cur.content = ev.target.result; 
+                cur.name = file.name.split('.')[0]; 
+                window.editorInstance.setValue(cur.content); 
+                window.renderTabs(); 
+                
+                // Login Check for Save
+                if (currentUser) {
+                    console.log("User logged in. Syncing to Cloud.");
+                    saveCore(); 
+                } else {
+                    console.log("Guest user. Saving to Device.");
+                    saveCore();
+                }
+            }
         }; r.readAsText(file);
     }; f.click();
 }});
 window.editorInstance.addAction({ id: 'format', label: 'Format Document', contextMenuGroupId: 'navigation', run: () => window.editorInstance.getAction('editor.action.formatDocument').run() });
+
 window.addEventListener('resize', window.updateIndicator);
 });
 
